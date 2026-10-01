@@ -44,8 +44,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (header != null && header.startsWith(BEARER_PREFIX)) {
             try {
                 Claims claims = jwtService.parseToken(header.substring(BEARER_PREFIX.length()));
+                AuthenticatedUser user = new AuthenticatedUser(claims.get("id", String.class), claims.getSubject());
                 UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(claims.getSubject(), null, List.of());
+                        new UsernamePasswordAuthenticationToken(user, null, List.of());
                 SecurityContextHolder.getContext().setAuthentication(auth);
             } catch (JwtException | IllegalArgumentException e) {
                 // Bad or expired token: leave the request unauthenticated.
