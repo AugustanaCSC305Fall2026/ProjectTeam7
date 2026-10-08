@@ -8,6 +8,8 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * Runs once each time the server starts, adding a default
  * admin user if no users are in the database yet.
@@ -44,7 +46,11 @@ import org.springframework.stereotype.Component;
         if (userRepository.count() > 0) {
             return;
         }
-        User admin = new User(null, adminName, adminEmail, passwordEncoder.encode(adminPassword));
+        String[] nameParts = adminName.trim().split("\\s+", 2);
+        String firstName = nameParts.length > 0 ? nameParts[0] : adminName;
+        String lastName = nameParts.length > 1 ? nameParts[1] : "";
+        User admin = new User(null, firstName, lastName, adminEmail,
+                passwordEncoder.encode(adminPassword), List.of("ADMIN"));
         userRepository.storeUser(admin);
     }
 }

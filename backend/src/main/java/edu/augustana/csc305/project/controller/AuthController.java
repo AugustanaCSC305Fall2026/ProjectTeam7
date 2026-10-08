@@ -8,6 +8,8 @@ import edu.augustana.csc305.project.security.JwtService;
 import edu.augustana.csc305.project.security.LoginResponse;
 import org.springframework.security.authentication.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -38,15 +40,38 @@ public class AuthController {
      * token.
      */
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest request) {
-        User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        try {
+            User user = userRepository.findByEmail(request.email())
+                    .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
 
-        if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
-            throw new BadCredentialsException("Invalid email or password");
+            if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+                throw new BadCredentialsException("Invalid email or password");
+            }
+
+            String token = jwtService.generateToken(user);
+            return ResponseEntity.ok(new LoginResponse(token, jwtService.getExpirationSeconds(),
+                    toUserDto(user)));
+        } catch (BadCredentialsException | IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("INVALID_CREDENTIALS");
         }
+    }
 
-        String token = jwtService.generateToken(user);
-        return new LoginResponse(token, new UserDto(user.getId().toString(), user.getName(), user.getEmail()));
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout() {
+        // JWT logout is client-side token disposal for the MVP.
+    }
+
+    private UserDto toUserDto(User user) {
+        String firstName = user.getFirstName();
+        String lastName = user.getLastName();
+        if (firstName == null && lastName == null) {
+            String[] nameParts = user.getName() == null ? new String[]{"", ""}
+                    : user.getName().trim().split("\\s+", 2);
+            firstName = nameParts.length > 0 ? nameParts[0] : "";
+            lastName = nameParts.length > 1 ? nameParts[1] : "";
+        }
+        return new UserDto(user.getId().toHexString(), firstName, lastName, user.getRoles());
     }
 }
