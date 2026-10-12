@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider, Link } from "react-router-dom";
 import GettingStarted from "./pages/GettingStarted";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import Shifts from "./pages/Shifts";
 
 /*
  * We use the react-router-dom library to load pages based
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+  path: "/shifts",
+  element: <Shifts />,
   },
   {
     path: "*",
