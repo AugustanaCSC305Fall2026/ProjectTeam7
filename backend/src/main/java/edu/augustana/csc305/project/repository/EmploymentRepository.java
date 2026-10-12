@@ -45,4 +45,11 @@ public class EmploymentRepository {
     public void storeEmployment(Employment employment) {
         employments.insertOne(employment);
     }
+
+    public Optional<Employment> findById(ObjectId employmentId) {
+        Employment employment = employments.find(
+        Filters.eq("_id", employmentId)).first();
+
+    return Optional.ofNullable(employment);
+}
 }
