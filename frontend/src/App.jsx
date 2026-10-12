@@ -3,6 +3,8 @@ import { createBrowserRouter, RouterProvider, Link } from "react-router-dom";
 import GettingStarted from "./pages/GettingStarted";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import Home from './pages/Home';
+import ProtectedRoute from "./components/ProtectedRoute";
 
 /*
  * We use the react-router-dom library to load pages based
@@ -15,7 +17,11 @@ import NotFound from "./pages/NotFound";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <GettingStarted />,
+    element:(
+    <ProtectedRoute>
+      <Home />
+    </ProtectedRoute>
+    ),
   },
   {
     path: "/login",
