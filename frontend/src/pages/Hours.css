@@ -1,0 +1,37 @@
+.hours-page {
+    padding: 24px;
+}
+
+.hours-filter {
+    margin-bottom: 20px;
+}
+
+.hours-filter select {
+    padding: 8px;
+    margin-left: 8px;
+}
+
+.hours-total {
+    margin-bottom: 24px;
+}
+
+.hours-total p {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.hours-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.hours-table th,
+.hours-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.hours-table th {
+    font-weight: bold;
+}
