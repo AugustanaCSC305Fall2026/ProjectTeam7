@@ -53,7 +53,8 @@ public ResponseEntity<ApiError> handleCorrectionError(
         CorrectionRequestService.CorrectionException exception) {
 
         HttpStatus status = switch (exception.getCode()) {
-            case "CORRECTION_NOT_PENDING" -> HttpStatus.CONFLICT;
+            case "CORRECTION_NOT_PENDING",
+                "TIME_ENTRY_CHANGED" -> HttpStatus.CONFLICT;
             default -> HttpStatus.BAD_REQUEST;
         };
 

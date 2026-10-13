@@ -8,7 +8,12 @@ import edu.augustana.csc305.project.model.TimeEntry;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.stereotype.Repository;
+import com.mongodb.client.model.FindOneAndUpdateOptions;
+import com.mongodb.client.model.ReturnDocument;
+import com.mongodb.client.model.Updates;
+import edu.augustana.csc305.project.model.EntrySource;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,5 +46,70 @@ public class TimeEntryRepository {
         }
 
         return results;
+    }
+
+    public Optional<TimeEntry> findOpenByUserId(ObjectId userId) {
+        TimeEntry entry = timeEntries.find(Filters.and(
+                Filters.eq("userId", userId),
+                Filters.eq("clockOutAt", null)
+        )).sort(Sorts.descending("clockInAt")).first();
+
+        return Optional.ofNullable(entry);
+    }
+
+    public void storeTimeEntry(TimeEntry entry) {
+        timeEntries.insertOne(entry);
+    }
+
+    public Optional<TimeEntry> clockOutOpenEntry(
+            ObjectId timeEntryId,
+            ObjectId userId,
+            Instant clockOutAt,
+            int workedMinutes) {
+
+        TimeEntry updated = timeEntries.findOneAndUpdate(
+                Filters.and(
+                        Filters.eq("_id", timeEntryId),
+                        Filters.eq("userId", userId),
+                        Filters.eq("clockOutAt", null)
+                ),
+                Updates.combine(
+                        Updates.set("clockOutAt", clockOutAt),
+                        Updates.set("workedMinutes", workedMinutes)
+                ),
+                new FindOneAndUpdateOptions()
+                        .returnDocument(ReturnDocument.AFTER)
+        );
+
+        return Optional.ofNullable(updated);
+    }
+
+    public Optional<TimeEntry> applyCorrection(
+        ObjectId timeEntryId,
+        ObjectId userId,
+        Instant expectedClockInAt,
+        Instant expectedClockOutAt,
+        Instant correctedClockInAt,
+        Instant correctedClockOutAt,
+        int workedMinutes) {
+
+        TimeEntry updated = timeEntries.findOneAndUpdate(
+                Filters.and(
+                        Filters.eq("_id", timeEntryId),
+                        Filters.eq("userId", userId),
+                        Filters.eq("clockInAt", expectedClockInAt),
+                        Filters.eq("clockOutAt", expectedClockOutAt)
+                ),
+                Updates.combine(
+                        Updates.set("clockInAt", correctedClockInAt),
+                        Updates.set("clockOutAt", correctedClockOutAt),
+                        Updates.set("workedMinutes", workedMinutes),
+                        Updates.set("source", EntrySource.CORRECTION)
+                ),
+                new FindOneAndUpdateOptions()
+                        .returnDocument(ReturnDocument.AFTER)
+        );
+
+        return Optional.ofNullable(updated);
     }
 }

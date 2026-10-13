@@ -46,6 +46,15 @@ public class CorrectionRequestRepository {
         return results;
     }
 
+    public Optional<CorrectionRequest> findPendingById(ObjectId correctionRequestId) {
+        CorrectionRequest request = requests.find(Filters.and(
+                Filters.eq("_id", correctionRequestId),
+                Filters.eq("status", CorrectionStatus.PENDING)
+        )).first();
+
+        return Optional.ofNullable(request);
+    }
+
     public void store(CorrectionRequest request) {
         requests.insertOne(request);
     }
