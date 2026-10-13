@@ -14,6 +14,7 @@ import edu.augustana.csc305.project.repository.ShiftRepository;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import edu.augustana.csc305.project.dto.CreateShiftRequestDto;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -35,6 +36,95 @@ public class ShiftService {
         this.employmentRepository = employmentRepository;
         this.jobRepository = jobRepository;
     }
+        public Shift createShift(
+        CreateShiftRequestDto request,
+        ObjectId supervisorId) {
+
+    if (request == null
+            || request.startAt() == null
+            || request.endAt() == null
+            || !request.endAt().isAfter(request.startAt())) {
+        throw new ShiftException(
+                HttpStatus.UNPROCESSABLE_ENTITY,
+                "INVALID_RANGE"
+        );
+    }
+
+    if (request.jobId() == null || !ObjectId.isValid(request.jobId())) {
+        throw new ShiftException(
+                HttpStatus.UNPROCESSABLE_ENTITY,
+                "INVALID_JOB_ID"
+        );
+    }
+
+    ObjectId jobId = new ObjectId(request.jobId());
+
+    jobRepository.findById(jobId)
+            .orElseThrow(() -> new ShiftException(
+                    HttpStatus.NOT_FOUND,
+                    "JOB_NOT_FOUND"
+            ));
+
+    ObjectId employmentId = null;
+    String submittedEmploymentId = request.employmentId();
+
+    if (submittedEmploymentId != null
+            && !submittedEmploymentId.isBlank()) {
+        if (!ObjectId.isValid(submittedEmploymentId)) {
+            throw new ShiftException(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "INVALID_EMPLOYMENT_ID"
+            );
+        }
+
+        employmentId = new ObjectId(submittedEmploymentId);
+
+        Employment employment = employmentRepository.findById(employmentId)
+                .orElseThrow(() -> new ShiftException(
+                        HttpStatus.NOT_FOUND,
+                        "EMPLOYMENT_NOT_FOUND"
+                ));
+
+        if (!employment.isActive()) {
+            throw new ShiftException(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "INACTIVE_EMPLOYMENT"
+            );
+        }
+
+        if (!jobId.equals(employment.getJobId())) {
+            throw new ShiftException(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "EMPLOYMENT_JOB_MISMATCH"
+            );
+        }
+
+        if (shiftRepository.hasConflictingShift(
+                employmentId,
+                request.startAt(),
+                request.endAt())) {
+            throw new ShiftException(
+                    HttpStatus.CONFLICT,
+                    "OVERLAPPING_SHIFT"
+            );
+        }
+    }
+
+    Shift shift = new Shift(
+            new ObjectId(),
+            employmentId,
+            jobId,
+            request.startAt(),
+            request.endAt(),
+            ShiftStatus.SCHEDULED,
+            request.note(),
+            null,
+            supervisorId
+    );
+
+    shiftRepository.storeShift(shift);
+    return shift;
+}
 
     public Shift offerShift(
             ObjectId shiftId,
@@ -329,6 +419,10 @@ public class ShiftService {
                 .map(shift -> toDto(shift, now))
                 .toList();
     }
+
+    public ShiftDto toDto(Shift shift) {
+        return toDto(shift, Instant.now());
+}
 
     private ShiftDto toDto(Shift shift, Instant now) {
 
