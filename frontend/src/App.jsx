@@ -3,7 +3,8 @@ import { createBrowserRouter, RouterProvider, Link } from "react-router-dom";
 import GettingStarted from "./pages/GettingStarted";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
-import Home from './pages/Home';
+import Shifts from "./pages/Shifts";
+import Home from "./pages/Home";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 /*
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+  path: "/shifts",
+  element: <Shifts />,
   },
   {
     path: "*",

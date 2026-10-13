@@ -1,0 +1,22 @@
+.shifts-page {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.shift-card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.shift-card p {
+  margin: 8px 0;
+}
+
+.shift-card button {
+  padding: 8px 16px;
+  margin-top: 10px;
+  cursor: pointer;
+}
