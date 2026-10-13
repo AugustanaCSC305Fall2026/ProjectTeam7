@@ -4,6 +4,7 @@ import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -48,6 +49,7 @@ import java.util.List;
                         .requestMatchers("/api/v1/auth/login").permitAll()
                         .requestMatchers("/api/v1/public/**").permitAll()
                         .requestMatchers("/api/v1/healthCheck").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/shifts").hasRole("ADMIN")
                         .anyRequest().authenticated() // All other requests need a token
                 )
                 /*

@@ -41,6 +41,20 @@ public class ShiftRepository {
     public void storeShift(Shift shift) {
         shifts.insertOne(shift);
     }
+    public boolean hasConflictingShift(
+        ObjectId employmentId,
+        Instant startAt,
+        Instant endAt) {
+
+        Bson filter = Filters.and(
+                Filters.eq("employmentId", employmentId),
+                Filters.ne("status", ShiftStatus.CANCELLED),
+                Filters.lt("startAt", Date.from(endAt)),
+                Filters.gt("endAt", Date.from(startAt))
+    );
+
+    return shifts.find(filter).first() != null;
+}
 
     public void updateShift(Shift shift) {
         shifts.replaceOne(

@@ -8,6 +8,8 @@ import org.bson.types.ObjectId;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import edu.augustana.csc305.project.dto.CreateShiftRequestDto;
+import org.springframework.http.HttpStatus;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -22,6 +24,18 @@ public class ShiftController {
     public ShiftController(ShiftService shiftService) {
         this.shiftService = shiftService;
     }
+
+    @PostMapping
+@ResponseStatus(HttpStatus.CREATED)
+public ShiftDto createShift(
+        @RequestBody CreateShiftRequestDto request,
+        @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+
+    ObjectId supervisorId = new ObjectId(authenticatedUser.id());
+    Shift createdShift = shiftService.createShift(request, supervisorId);
+
+    return shiftService.toDto(createdShift);
+}
 
     @PostMapping("/{id}/offer")
     public ShiftDto offerShift(
