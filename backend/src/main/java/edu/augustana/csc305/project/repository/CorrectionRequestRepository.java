@@ -11,6 +11,9 @@ import org.springframework.stereotype.Repository;
 import com.mongodb.client.model.Sorts;
 import java.util.ArrayList;
 import java.util.List;
+import com.mongodb.client.model.FindOneAndUpdateOptions;
+import com.mongodb.client.model.ReturnDocument;
+import com.mongodb.client.model.Updates;
 
 import java.util.Optional;
 
@@ -45,5 +48,26 @@ public class CorrectionRequestRepository {
 
     public void store(CorrectionRequest request) {
         requests.insertOne(request);
+    }
+
+    public Optional<CorrectionRequest> updatePendingStatus(
+        ObjectId correctionRequestId,
+        CorrectionStatus newStatus,
+        String reviewNote) {
+
+        CorrectionRequest updated = requests.findOneAndUpdate(
+                Filters.and(
+                        Filters.eq("_id", correctionRequestId),
+                        Filters.eq("status", CorrectionStatus.PENDING)
+                ),
+                Updates.combine(
+                        Updates.set("status", newStatus),
+                        Updates.set("reviewNote", reviewNote)
+                ),
+                new FindOneAndUpdateOptions()
+                        .returnDocument(ReturnDocument.AFTER)
+        );
+
+        return Optional.ofNullable(updated);
     }
 }

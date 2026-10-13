@@ -46,6 +46,40 @@ public class CorrectionRequestService {
                 .toList();
     }
 
+    public CorrectionRequestDto approve(String requestId, String reviewNote) {
+        return review(requestId, CorrectionStatus.APPROVED, reviewNote);
+    }
+
+    public CorrectionRequestDto reject(String requestId, String reviewNote) {
+        return review(requestId, CorrectionStatus.REJECTED, reviewNote);
+    }
+
+    private CorrectionRequestDto review(
+            String requestId,
+            CorrectionStatus newStatus,
+            String reviewNote) {
+
+        ObjectId correctionRequestId = parseObjectId(requestId, "correctionRequestId");
+
+        CorrectionRequest request = correctionRequestRepository
+                .updatePendingStatus(correctionRequestId, newStatus, reviewNote)
+                .orElseThrow(() -> new CorrectionException("CORRECTION_NOT_PENDING"));
+
+        TimeEntry entry = timeEntryRepository
+                .findByIdAndUserId(request.getTimeEntryId(), request.getUserId())
+                .orElseThrow(() -> new IllegalStateException(
+                        "Correction request refers to a missing time entry"));
+
+        String jobTitle = employmentRepository.findById(entry.getEmploymentId())
+                .map(Employment::getJobId)
+                .flatMap(jobRepository::findById)
+                .map(Job::getTitle)
+                .orElseThrow(() -> new IllegalStateException(
+                        "Time entry refers to a job that does not exist"));
+
+        return toDto(request, jobTitle);
+    }
+
     public CorrectionRequestDto submit(ObjectId userId, CreateCorrectionRequest input) {
         ObjectId timeEntryId = parseObjectId(input.timeEntryId(), "timeEntryId");
         TimeEntry entry = timeEntryRepository.findByIdAndUserId(timeEntryId, userId)
