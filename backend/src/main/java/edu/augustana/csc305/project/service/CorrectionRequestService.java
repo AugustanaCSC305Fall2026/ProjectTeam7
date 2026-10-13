@@ -13,7 +13,11 @@ import edu.augustana.csc305.project.repository.JobRepository;
 import edu.augustana.csc305.project.repository.TimeEntryRepository;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
+import edu.augustana.csc305.project.repository.UserRepository;
+import edu.augustana.csc305.project.dto.PendingCorrectionDto;
+import edu.augustana.csc305.project.model.User;
 
+import java.util.List;
 import java.time.Instant;
 
 @Service
@@ -22,15 +26,24 @@ public class CorrectionRequestService {
     private final CorrectionRequestRepository correctionRequestRepository;
     private final EmploymentRepository employmentRepository;
     private final JobRepository jobRepository;
+    private final UserRepository userRepository;
 
     public CorrectionRequestService(TimeEntryRepository timeEntryRepository,
                                     CorrectionRequestRepository correctionRequestRepository,
                                     EmploymentRepository employmentRepository,
-                                    JobRepository jobRepository) {
+                                    JobRepository jobRepository, UserRepository userRepository) {
         this.timeEntryRepository = timeEntryRepository;
         this.correctionRequestRepository = correctionRequestRepository;
         this.employmentRepository = employmentRepository;
         this.jobRepository = jobRepository;
+        this.userRepository = userRepository;
+    }
+
+    public List<PendingCorrectionDto> getPendingCorrections() {
+        return correctionRequestRepository.findPending()
+                .stream()
+                .map(this::toPendingCorrectionDto)
+                .toList();
     }
 
     public CorrectionRequestDto submit(ObjectId userId, CreateCorrectionRequest input) {
@@ -73,6 +86,60 @@ public class CorrectionRequestService {
         correctionRequestRepository.store(request);
 
         return toDto(request, jobTitle);
+    }
+
+    private PendingCorrectionDto toPendingCorrectionDto(
+        CorrectionRequest request) {
+
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() ->
+                        new IllegalStateException(
+                                "Correction request refers to a missing user"
+                        ));
+
+        TimeEntry entry = timeEntryRepository
+                .findByIdAndUserId(
+                        request.getTimeEntryId(),
+                        request.getUserId()
+                )
+                .orElseThrow(() ->
+                        new IllegalStateException(
+                                "Correction request refers to a missing time entry"
+                        ));
+
+        String jobTitle = employmentRepository
+                .findById(entry.getEmploymentId())
+                .map(Employment::getJobId)
+                .flatMap(jobRepository::findById)
+                .map(Job::getTitle)
+                .orElseThrow(() ->
+                        new IllegalStateException(
+                                "Time entry refers to a missing job"
+                        ));
+
+        String employeeName = user.getName();
+        if (user.getFirstName() != null || user.getLastName() != null) {
+            employeeName = (
+                    (user.getFirstName() == null ? "" : user.getFirstName())
+                            + " "
+                            + (user.getLastName() == null ? "" : user.getLastName())
+            ).trim();
+        }
+
+        return new PendingCorrectionDto(
+                request.getId().toHexString(),
+                employeeName,
+                user.getEmail(),
+                jobTitle,
+                request.getTimeEntryId().toHexString(),
+                request.getOriginalClockInAt(),
+                request.getOriginalClockOutAt(),
+                request.getProposedClockInAt(),
+                request.getProposedClockOutAt(),
+                request.getReason(),
+                request.getStatus(),
+                request.getCreatedAt()
+        );
     }
 
     private ObjectId parseObjectId(String value, String field) {

@@ -8,6 +8,9 @@ import edu.augustana.csc305.project.model.CorrectionStatus;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.stereotype.Repository;
+import com.mongodb.client.model.Sorts;
+import java.util.ArrayList;
+import java.util.List;
 
 import java.util.Optional;
 
@@ -26,6 +29,18 @@ public class CorrectionRequestRepository {
                 Filters.eq("userId", userId),
                 Filters.eq("status", CorrectionStatus.PENDING)
         )).first() != null;
+    }
+    
+    public List<CorrectionRequest> findPending() {
+        List<CorrectionRequest> results = new ArrayList<>();
+
+        for (CorrectionRequest request : requests.find(
+                Filters.eq("status", CorrectionStatus.PENDING)
+        ).sort(Sorts.ascending("createdAt"))) {
+            results.add(request);
+        }
+
+        return results;
     }
 
     public void store(CorrectionRequest request) {

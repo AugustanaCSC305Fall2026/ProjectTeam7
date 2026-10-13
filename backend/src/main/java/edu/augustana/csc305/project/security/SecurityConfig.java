@@ -50,6 +50,7 @@ import java.util.List;
                         .requestMatchers("/api/v1/public/**").permitAll()
                         .requestMatchers("/api/v1/healthCheck").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/shifts").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/admin/corrections/pending").hasRole("ADMIN")
                         .anyRequest().authenticated() // All other requests need a token
                 )
                 /*
