@@ -10,18 +10,26 @@ public record ShiftDto(
         String id,
         String employmentId,
         String jobId,
+        String jobTitle,
         Instant startAt,
         Instant endAt,
         ShiftStatus status,
         String note,
         ShiftOffer offer,
-        String createdByUserId
+        String createdByUserId,
+        boolean canOffer
 ) {
+
     public static ShiftDto fromShift(Shift shift) {
         return new ShiftDto(
                 shift.getId() == null ? null : shift.getId().toHexString(),
-                shift.getEmploymentId() == null ? null : shift.getEmploymentId().toHexString(),
-                shift.getJobId() == null ? null : shift.getJobId().toHexString(),
+                shift.getEmploymentId() == null
+                        ? null
+                        : shift.getEmploymentId().toHexString(),
+                shift.getJobId() == null
+                        ? null
+                        : shift.getJobId().toHexString(),
+                null,
                 shift.getStartAt(),
                 shift.getEndAt(),
                 shift.getStatus(),
@@ -29,7 +37,9 @@ public record ShiftDto(
                 shift.getOffer(),
                 shift.getCreatedByUserId() == null
                         ? null
-                        : shift.getCreatedByUserId().toHexString()
+                        : shift.getCreatedByUserId().toHexString(),
+                shift.getStartAt() != null
+                        && shift.getStartAt().isAfter(Instant.now())
         );
     }
 }

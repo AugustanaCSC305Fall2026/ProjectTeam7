@@ -4,6 +4,8 @@ import GettingStarted from "./pages/GettingStarted";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Shifts from "./pages/Shifts";
+import Home from "./pages/Home";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 /*
  * We use the react-router-dom library to load pages based
@@ -16,7 +18,11 @@ import Shifts from "./pages/Shifts";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <GettingStarted />,
+    element:(
+    <ProtectedRoute>
+      <Home />
+    </ProtectedRoute>
+    ),
   },
   {
     path: "/login",

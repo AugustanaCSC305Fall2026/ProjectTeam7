@@ -4,13 +4,15 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.Instant;
 import java.time.Duration;
+import java.time.Instant;
 
 @Document(collection = "shifts")
-public class Shift{
+public class Shift {
+
     @Id
     private ObjectId id;
+
     private ObjectId employmentId;
     private ObjectId jobId;
     private Instant startAt;
@@ -20,19 +22,33 @@ public class Shift{
     private ShiftOffer offer;
     private ObjectId createdByUserId;
 
-    public Shift(){
-
+    public Shift() {
     }
 
-    public Shift(ObjectId id,
-     ObjectId employmentId,
-     ObjectId jobId,
-     Instant startAt,
-     Instant endAt,
-     ShiftStatus status,
-     String note,
-     ShiftOffer offer,
-     ObjectId createdByUserId){
+    public Shift(
+            ObjectId id,
+            ObjectId employmentId,
+            ObjectId jobId,
+            Instant startAt,
+            Instant endAt,
+            ShiftStatus status,
+            String note) {
+
+        this(id, employmentId, jobId, startAt, endAt,
+                status, note, null, null);
+    }
+
+    public Shift(
+            ObjectId id,
+            ObjectId employmentId,
+            ObjectId jobId,
+            Instant startAt,
+            Instant endAt,
+            ShiftStatus status,
+            String note,
+            ShiftOffer offer,
+            ObjectId createdByUserId) {
+
         this.id = id;
         this.employmentId = employmentId;
         this.jobId = jobId;
@@ -44,83 +60,83 @@ public class Shift{
         this.createdByUserId = createdByUserId;
     }
 
-    public ObjectId getId(){
+    public ObjectId getId() {
         return id;
     }
 
-    public void setId(ObjectId id){
+    public void setId(ObjectId id) {
         this.id = id;
     }
-    
-    public ObjectId getEmploymentId(){
+
+    public ObjectId getEmploymentId() {
         return employmentId;
     }
 
-    public void setEmploymentId(ObjectId employmentId){
+    public void setEmploymentId(ObjectId employmentId) {
         this.employmentId = employmentId;
     }
 
-    public ObjectId getJobId(){
+    public ObjectId getJobId() {
         return jobId;
     }
 
-    public void setJobId(ObjectId jobId){
+    public void setJobId(ObjectId jobId) {
         this.jobId = jobId;
     }
 
-    public Instant getStartAt(){
+    public Instant getStartAt() {
         return startAt;
     }
 
-    public void setStartAt(Instant startAt){
+    public void setStartAt(Instant startAt) {
         this.startAt = startAt;
     }
 
-    public Instant getEndAt(){
+    public Instant getEndAt() {
         return endAt;
     }
 
-    public void setEndAt(Instant endAt){
+    public void setEndAt(Instant endAt) {
         this.endAt = endAt;
     }
 
-    public ShiftStatus getStatus(){
+    public ShiftStatus getStatus() {
         return status;
     }
 
-    public void setStatus(ShiftStatus status){
+    public void setStatus(ShiftStatus status) {
         this.status = status;
     }
 
-    public String getNote(){
+    public String getNote() {
         return note;
     }
 
-    public void setNote(String note){
+    public void setNote(String note) {
         this.note = note;
     }
 
-    public ShiftOffer getOffer(){
+    public ShiftOffer getOffer() {
         return offer;
     }
 
-    public void setOffer(ShiftOffer offer){
+    public void setOffer(ShiftOffer offer) {
         this.offer = offer;
     }
 
-    public ObjectId getCreatedByUserId(){
+    public ObjectId getCreatedByUserId() {
         return createdByUserId;
     }
 
-    public void setCreatedByUserId(ObjectId createdByUserId){
+    public void setCreatedByUserId(ObjectId createdByUserId) {
         this.createdByUserId = createdByUserId;
     }
 
-    public int durationMinutes(){
+    public int durationMinutes() {
         return (int) Duration.between(startAt, endAt).toMinutes();
     }
 
-    public boolean hasStarted(){
+    public boolean hasStarted() {
         return !Instant.now().isBefore(startAt);
     }
 }

@@ -1,79 +1,119 @@
 package edu.augustana.csc305.project.service;
 
-import edu.augustana.csc305.project.repository.ShiftRepository;
+import edu.augustana.csc305.project.dto.OpenShiftDto;
+import edu.augustana.csc305.project.dto.ShiftDto;
+import edu.augustana.csc305.project.exception.ShiftException;
+import edu.augustana.csc305.project.model.Employment;
+import edu.augustana.csc305.project.model.Job;
+import edu.augustana.csc305.project.model.Shift;
+import edu.augustana.csc305.project.model.ShiftOffer;
+import edu.augustana.csc305.project.model.ShiftStatus;
 import edu.augustana.csc305.project.repository.EmploymentRepository;
 import edu.augustana.csc305.project.repository.JobRepository;
-
-import edu.augustana.csc305.project.model.Shift;
-import edu.augustana.csc305.project.model.Employment;
-import edu.augustana.csc305.project.model.ShiftStatus;
-import edu.augustana.csc305.project.model.ShiftOffer;
-import edu.augustana.csc305.project.model.Job;
-import edu.augustana.csc305.project.dto.OpenShiftDto;
-import edu.augustana.csc305.project.exception.ShiftException;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.time.Instant;
-
+import edu.augustana.csc305.project.repository.ShiftRepository;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class ShiftService {
+
     private final ShiftRepository shiftRepository;
     private final EmploymentRepository employmentRepository;
     private final JobRepository jobRepository;
 
     public ShiftService(
             ShiftRepository shiftRepository,
-            EmploymentRepository employmentRepository, JobRepository jobRepository) {
+            EmploymentRepository employmentRepository,
+            JobRepository jobRepository) {
+
         this.shiftRepository = shiftRepository;
         this.employmentRepository = employmentRepository;
         this.jobRepository = jobRepository;
     }
 
-    public Shift offerShift(ObjectId shiftId, ObjectId userId, String reason){
+    public Shift offerShift(
+            ObjectId shiftId,
+            ObjectId userId,
+            String reason) {
+
         Shift shift = shiftRepository.findById(shiftId)
-        .orElseThrow(() -> new IllegalArgumentException("Shift does not exist"));
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Shift does not exist"));
 
-        Employment employment = employmentRepository.findByIdAndUserId(shift.getEmploymentId(), userId)
-        .orElseThrow(() -> new ShiftException(HttpStatus.FORBIDDEN, "NOT_YOUR_SHIFT"));
+        Employment employment = employmentRepository
+                .findByIdAndUserId(shift.getEmploymentId(), userId)
+                .orElseThrow(() ->
+                        new ShiftException(
+                                HttpStatus.FORBIDDEN,
+                                "NOT_YOUR_SHIFT"
+                        ));
 
-        if(shift.hasStarted()){
-            throw new ShiftException(HttpStatus.CONFLICT, "SHIFT_ALREADY_STARTED");
+        if (shift.hasStarted()) {
+            throw new ShiftException(
+                    HttpStatus.CONFLICT,
+                    "SHIFT_ALREADY_STARTED"
+            );
         }
 
-        if (shift.getStatus() == ShiftStatus.OFFERED){
-            throw new ShiftException(HttpStatus.CONFLICT, "ALREADY_OFFERED");
+        if (shift.getStatus() == ShiftStatus.OFFERED) {
+            throw new ShiftException(
+                    HttpStatus.CONFLICT,
+                    "ALREADY_OFFERED"
+            );
         }
 
-        ShiftOffer offer = new ShiftOffer(employment.getId(), Instant.now(), reason, null, null);
+        ShiftOffer offer = new ShiftOffer(
+                employment.getId(),
+                Instant.now(),
+                reason,
+                null,
+                null
+        );
 
         shift.setOffer(offer);
         shift.setStatus(ShiftStatus.OFFERED);
 
         shiftRepository.updateShift(shift);
-        
+
         return shift;
     }
 
-     public Shift withdrawOffer(ObjectId shiftId, ObjectId userId){
+    public Shift withdrawOffer(
+            ObjectId shiftId,
+            ObjectId userId) {
+
         Shift shift = shiftRepository.findById(shiftId)
-        .orElseThrow(() -> new IllegalArgumentException("Shift does not exist"));
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Shift does not exist"));
 
-        employmentRepository.findByIdAndUserId(shift.getEmploymentId(), userId)
-        .orElseThrow(() -> new ShiftException(HttpStatus.FORBIDDEN, "NOT_YOUR_SHIFT"));
+        employmentRepository
+                .findByIdAndUserId(shift.getEmploymentId(), userId)
+                .orElseThrow(() ->
+                        new ShiftException(
+                                HttpStatus.FORBIDDEN,
+                                "NOT_YOUR_SHIFT"
+                        ));
 
-         if (shift.getOffer() != null && shift.getOffer().getClaimedByEmploymentId() != null){
-             throw new ShiftException(HttpStatus.CONFLICT, "OFFER_ALREADY_CLAIMED");
-         }
+        if (shift.getOffer() != null
+                && shift.getOffer().getClaimedByEmploymentId() != null) {
 
-        if (shift.getStatus() != ShiftStatus.OFFERED){
-            throw new ShiftException(HttpStatus.CONFLICT, "SHIFT_NOT_OFFERED");
+            throw new ShiftException(
+                    HttpStatus.CONFLICT,
+                    "OFFER_ALREADY_CLAIMED"
+            );
         }
 
+        if (shift.getStatus() != ShiftStatus.OFFERED) {
+            throw new ShiftException(
+                    HttpStatus.CONFLICT,
+                    "SHIFT_NOT_OFFERED"
+            );
+        }
 
         shift.setOffer(null);
         shift.setStatus(ShiftStatus.SCHEDULED);
@@ -83,11 +123,18 @@ public class ShiftService {
         return shift;
     }
 
-    public List<OpenShiftDto> getOpenShifts(ObjectId userId,Instant from, Instant to) {
-        List<Employment> userEmployments = employmentRepository.findByUserId(userId);
+    public List<OpenShiftDto> getOpenShifts(
+            ObjectId userId,
+            Instant from,
+            Instant to) {
+
+        List<Employment> userEmployments =
+                employmentRepository.findByUserId(userId);
+
         List<OpenShiftDto> openShifts = new ArrayList<>();
 
-        for (Shift shift : shiftRepository.findOfferedShiftsBetween(from, to)) {
+        for (Shift shift :
+                shiftRepository.findOfferedShiftsBetween(from, to)) {
 
             // Do not show the user's own offered shift.
             boolean ownShift = false;
@@ -96,6 +143,7 @@ public class ShiftService {
                 if (shift.getOffer() != null
                         && employment.getId().equals(
                         shift.getOffer().getOfferedByEmploymentId())) {
+
                     ownShift = true;
                     break;
                 }
@@ -110,26 +158,29 @@ public class ShiftService {
 
             for (Employment employment : userEmployments) {
                 if (employment.isActive()
-                        && employment.getJobId().equals(shift.getJobId())) {
+                        && employment.getJobId().equals(
+                        shift.getJobId())) {
+
                     matchingEmployment = employment;
                     break;
                 }
             }
 
-            // User does not work this job, so they should not see the shift.
             if (matchingEmployment == null) {
                 continue;
             }
 
             boolean eligible = true;
 
-            // Check whether this employment already has an overlapping shift.
             for (Shift existingShift :
-                    shiftRepository.findByEmploymentId(matchingEmployment.getId())) {
+                    shiftRepository.findByEmploymentId(
+                            matchingEmployment.getId())) {
 
                 if (existingShift.getStatus() != ShiftStatus.CANCELLED
-                        && existingShift.getStartAt().isBefore(shift.getEndAt())
-                        && existingShift.getEndAt().isAfter(shift.getStartAt())) {
+                        && existingShift.getStartAt()
+                        .isBefore(shift.getEndAt())
+                        && existingShift.getEndAt()
+                        .isAfter(shift.getStartAt())) {
 
                     eligible = false;
                     break;
@@ -138,7 +189,9 @@ public class ShiftService {
 
             Job job = jobRepository.findById(shift.getJobId())
                     .orElseThrow(() ->
-                            new IllegalStateException("Shift refers to a job that does not exist"));
+                            new IllegalStateException(
+                                    "Shift refers to a job that does not exist"
+                            ));
 
             String reason = shift.getOffer() == null
                     ? null
@@ -164,23 +217,42 @@ public class ShiftService {
             ObjectId userId) {
 
         Shift shift = shiftRepository.findById(shiftId)
-                .orElseThrow(() -> new IllegalArgumentException("Shift does not exist"));
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Shift does not exist"));
 
         if (shift.getStatus() != ShiftStatus.OFFERED
-                || shift.getOffer() == null) {throw new ShiftException(HttpStatus.CONFLICT, "SHIFT_ALREADY_CLAIMED");
+                || shift.getOffer() == null) {
+
+            throw new ShiftException(
+                    HttpStatus.CONFLICT,
+                    "SHIFT_ALREADY_CLAIMED"
+            );
         }
 
-        Employment employment = employmentRepository.findByIdAndUserId(employmentId, userId)
-                .orElseThrow(() -> new ShiftException(
-                        HttpStatus.FORBIDDEN, "WRONG_JOB"));
+        Employment employment = employmentRepository
+                .findByIdAndUserId(employmentId, userId)
+                .orElseThrow(() ->
+                        new ShiftException(
+                                HttpStatus.FORBIDDEN,
+                                "WRONG_JOB"
+                        ));
 
         if (!employment.isActive()
                 || !employment.getJobId().equals(shift.getJobId())) {
-            throw new ShiftException(HttpStatus.FORBIDDEN, "WRONG_JOB");
+
+            throw new ShiftException(
+                    HttpStatus.FORBIDDEN,
+                    "WRONG_JOB"
+            );
         }
 
-        if (shift.getOffer().getOfferedByEmploymentId().equals(employmentId)) {
-            throw new ShiftException(HttpStatus.CONFLICT, "CANNOT_CLAIM_OWN_SHIFT"
+        if (shift.getOffer()
+                .getOfferedByEmploymentId()
+                .equals(employmentId)) {
+
+            throw new ShiftException(
+                    HttpStatus.CONFLICT,
+                    "CANNOT_CLAIM_OWN_SHIFT"
             );
         }
 
@@ -188,8 +260,10 @@ public class ShiftService {
                 shiftRepository.findByEmploymentId(employmentId)) {
 
             if (existingShift.getStatus() != ShiftStatus.CANCELLED
-                    && existingShift.getStartAt().isBefore(shift.getEndAt())
-                    && existingShift.getEndAt().isAfter(shift.getStartAt())) {
+                    && existingShift.getStartAt()
+                    .isBefore(shift.getEndAt())
+                    && existingShift.getEndAt()
+                    .isAfter(shift.getStartAt())) {
 
                 throw new ShiftException(
                         HttpStatus.CONFLICT,
@@ -202,24 +276,96 @@ public class ShiftService {
                 shiftId,
                 employmentId,
                 Instant.now()
-        ).orElseThrow(() -> new ShiftException(
-                HttpStatus.CONFLICT,
-                "SHIFT_ALREADY_CLAIMED"
-        ));
+        ).orElseThrow(() ->
+                new ShiftException(
+                        HttpStatus.CONFLICT,
+                        "SHIFT_ALREADY_CLAIMED"
+                ));
     }
 
     public List<Shift> getMyShifts(ObjectId userId) {
-        List<Employment> userEmployments = employmentRepository.findByUserId(userId);
+
+        List<Employment> userEmployments =
+                employmentRepository.findByUserId(userId);
+
         List<Shift> myShifts = new ArrayList<>();
 
         for (Employment employment : userEmployments) {
             if (employment.isActive()) {
                 myShifts.addAll(
-                        shiftRepository.findByEmploymentId(employment.getId())
+                        shiftRepository.findByEmploymentId(
+                                employment.getId()
+                        )
                 );
             }
         }
 
         return myShifts;
+    }
+
+    // Upcoming-shifts functionality from develop.
+    public List<ShiftDto> getUpcomingShifts(
+            ObjectId userId,
+            Instant from,
+            Instant to) {
+
+        List<Employment> employments =
+                employmentRepository.findByUserId(userId);
+
+        List<ObjectId> employmentIds = employments.stream()
+                .filter(Employment::isActive)
+                .map(Employment::getId)
+                .toList();
+
+        Instant now = Instant.now();
+
+        return shiftRepository
+                .findByEmploymentIdsAndRange(
+                        employmentIds,
+                        from,
+                        to
+                )
+                .stream()
+                .map(shift -> toDto(shift, now))
+                .toList();
+    }
+
+    private ShiftDto toDto(Shift shift, Instant now) {
+
+        String jobTitle = jobRepository.findById(shift.getJobId())
+                .map(Job::getTitle)
+                .orElseThrow(() ->
+                        new IllegalStateException(
+                                "Shift refers to a job that does not exist"
+                        ));
+
+        return new ShiftDto(
+                shift.getId() == null
+                        ? null
+                        : shift.getId().toHexString(),
+
+                shift.getEmploymentId() == null
+                        ? null
+                        : shift.getEmploymentId().toHexString(),
+
+                shift.getJobId() == null
+                        ? null
+                        : shift.getJobId().toHexString(),
+
+                jobTitle,
+
+                shift.getStartAt(),
+                shift.getEndAt(),
+                shift.getStatus(),
+                shift.getNote(),
+                shift.getOffer(),
+
+                shift.getCreatedByUserId() == null
+                        ? null
+                        : shift.getCreatedByUserId().toHexString(),
+
+                shift.getStartAt() != null
+                        && shift.getStartAt().isAfter(now)
+        );
     }
 }
