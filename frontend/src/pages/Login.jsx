@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/backendApi.js';
 import './Login.css';
+
 
 /*
  * A simple login page to help you get started with authenticating
  * users.
  */
 function Login() {
-
+    const navigate = useNavigate();
   // This component needs to track state, namely the user's credentials
   // and a possible error message.
   //
@@ -46,7 +48,7 @@ function Login() {
       // ***  Instead of alert(...), redirect to authenticated home
       // ***  screen (or wherever you want to go after login) here.
       // ***
-      alert('Login successful!');
+      navigate('/',{ replace: true });
     } catch (err) {
       // On failure, set an error message.
       setError('Invalid email or password.');

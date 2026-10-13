@@ -31,6 +31,11 @@ public class EmploymentRepository {
         return results;
     }
 
+    public Optional<Employment> findById(ObjectId employmentId) {
+        Employment employment = employments.find(Filters.eq("_id", employmentId)).first();
+        return Optional.ofNullable(employment);
+    }
+
     public Optional<Employment> findByIdAndUserId(ObjectId employmentId, ObjectId userId) {
         Employment employment = employments.find(
                 Filters.and(
@@ -45,11 +50,4 @@ public class EmploymentRepository {
     public void storeEmployment(Employment employment) {
         employments.insertOne(employment);
     }
-
-    public Optional<Employment> findById(ObjectId employmentId) {
-        Employment employment = employments.find(
-        Filters.eq("_id", employmentId)).first();
-
-    return Optional.ofNullable(employment);
-}
 }
