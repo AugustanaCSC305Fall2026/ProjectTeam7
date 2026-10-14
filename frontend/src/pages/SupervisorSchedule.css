@@ -1,0 +1,100 @@
+.supervisor-schedule {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 28px;
+  border: 1px solid #e3e7e4;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.supervisor-schedule h2 {
+  margin: 0 0 8px;
+  text-align: left;
+}
+
+.supervisor-schedule > p {
+  margin: 0 0 20px;
+  color: #7b8581;
+  text-align: left;
+}
+
+.supervisor-schedule form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.supervisor-schedule label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #56615d;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.supervisor-schedule input,
+.supervisor-schedule textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d8dedb;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #26322f;
+  font: inherit;
+}
+
+.supervisor-schedule textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.supervisor-schedule .schedule-note-field {
+  grid-column: 1 / -1;
+}
+
+.supervisor-schedule button {
+  justify-self: start;
+  padding: 10px 16px;
+  border: 1px solid #17805c;
+  border-radius: 6px;
+  background: #17805c;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.supervisor-schedule button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.supervisor-schedule [role="status"],
+.supervisor-schedule [role="alert"] {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  text-align: left;
+}
+
+.supervisor-schedule [role="status"] {
+  background: #e6f3ed;
+  color: #187957;
+}
+
+.supervisor-schedule [role="alert"] {
+  background: #fff1f1;
+  color: #a64242;
+}
+
+@media (max-width: 640px) {
+  .supervisor-schedule form {
+    grid-template-columns: 1fr;
+  }
+
+  .supervisor-schedule .schedule-note-field {
+    grid-column: auto;
+  }
+}

@@ -2,11 +2,28 @@ import { NavLink, useNavigate } from "react-router-dom";
 import "./StudentLayout.css";
 import logo from "../assets/augustana-logo.png";
 
-function StudentLayout({ title, subtitle, children }) {
+const studentNavItems = [
+  { to: "/", label: "Dashboard" },
+  { to: "/hours", label: "Hours" },
+  { to: "/calendar", label: "Calendar" },
+  { to: "/shifts", label: "Shift Management" },
+];
+
+function StudentLayout({
+  children,
+  title,
+  subtitle,
+  sectionLabel = "MAIN",
+  userLabel = "Student",
+  navItems = studentNavItems,
+  showComingSoon = true,
+  showProfileLink = true,
+}) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     navigate("/login", { replace: true });
   };
 
@@ -21,28 +38,34 @@ function StudentLayout({ title, subtitle, children }) {
           </div>
         </div>
 
-        <p className="sidebar-label">MAIN</p>
+        <p className="sidebar-label">{sectionLabel}</p>
 
         <nav className="student-nav">
-          <NavLink to="/">Dashboard</NavLink>
-          <NavLink to="/hours">Hours</NavLink>
-          <NavLink to="/calendar">Calendar</NavLink>
-          <NavLink to="/shifts">Shift Management</NavLink>
+          {navItems.map((item) => (
+          <NavLink key={item.to} to={item.to} end={item.end}>
+          {item.label}
+          </NavLink>))}
         </nav>
 
-        <p className="sidebar-label coming-soon-label">COMING SOON</p>
+                {showComingSoon && (
+          <>
+            <p className="sidebar-label coming-soon-label">COMING SOON</p>
 
-        <div className="student-nav future-nav">
-          <span>
-            Jobs <small>SOON</small>
-          </span>
-          <span>
-            Messages <small>SOON</small>
-          </span>
-        </div>
+            <div className="student-nav future-nav">
+              <span>
+                Jobs <small>SOON</small>
+              </span>
+              <span>
+                Messages <small>SOON</small>
+              </span>
+            </div>
+          </>
+        )}
 
         <div className="sidebar-bottom">
-          <NavLink to="/profile">Profile & Settings</NavLink>
+          {showProfileLink && (
+  <NavLink to="/profile">Profile & Settings</NavLink>
+)}
 
           <button className="logout-button" onClick={handleLogout}>
             Logout
@@ -62,8 +85,8 @@ function StudentLayout({ title, subtitle, children }) {
           </div>
 
           <div className="student-user">
-            <div className="user-avatar">U</div>
-            <span>Student</span>
+            <div className="user-avatar">{userLabel.charAt(0)}</div>
+            <span>{userLabel}</span>
           </div>
         </header>
 

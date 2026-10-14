@@ -8,7 +8,12 @@ import Hours from "./pages/Hours";
 import Home from "./pages/Home";
 import Calendar from "./pages/Calendar";
 import ProtectedRoute from "./components/ProtectedRoute";
-
+import RoleProtectedRoute from "./components/RoleProtectedRoute";
+import SupervisorLayout from "./components/SupervisorLayout";
+import SupervisorDashboard from "./pages/SupervisorDashboard";
+import SupervisorCorrections from "./pages/SupervisorCorrections";
+import SupervisorSchedule from "./pages/SupervisorSchedule";
+import SupervisorAvailability from "./pages/SupervisorAvailability";
 
 /*
  * We use the react-router-dom library to load pages based
@@ -55,6 +60,29 @@ const router = createBrowserRouter([
     </ProtectedRoute>
     ),
   },
+  {
+  path: "/supervisor",
+  element: (
+    <RoleProtectedRoute requiredRole="ADMIN">
+      <SupervisorLayout />
+    </RoleProtectedRoute>
+  ),
+  children: [
+    { index: true, element: <SupervisorDashboard /> },
+    {
+      path: "schedule",
+      element: <SupervisorSchedule />,
+    },
+    {
+      path: "corrections",
+      element: <SupervisorCorrections />,
+    },
+    {
+      path: "availability",
+      element: <SupervisorAvailability />,
+    },
+  ],
+},
   {
     path: "*",
     element: <NotFound />,
