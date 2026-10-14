@@ -1,0 +1,185 @@
+* {
+  box-sizing: border-box;
+}
+
+.student-layout {
+  min-height: 100vh;
+  display: flex;
+  background: #f7f8f6;
+  color: #26322f;
+}
+
+.student-sidebar {
+  width: 230px;
+  min-height: 100vh;
+  background: #ffffff;
+  border-right: 1px solid #e3e7e4;
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.student-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 36px;
+}
+
+.student-brand img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.student-brand h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.student-brand p {
+  margin: 2px 0 0;
+  color: #7b8581;
+  font-size: 13px;
+}
+
+.sidebar-label {
+  margin: 0 0 10px;
+  color: #9aa29f;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.student-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.student-nav a,
+.sidebar-bottom a {
+  padding: 10px 12px;
+  border-radius: 7px;
+  color: #56615d;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.student-nav a:hover,
+.sidebar-bottom a:hover {
+  background: #f0f5f2;
+}
+
+.student-nav a.active {
+  background: #e6f3ed;
+  color: #187957;
+  font-weight: 600;
+}
+
+.coming-soon-label {
+  margin-top: 32px;
+}
+
+.future-nav span {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 12px;
+  color: #9aa29f;
+  font-size: 14px;
+}
+
+.future-nav small {
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.logout-button {
+  background: transparent;
+  color: #56615d;
+  border: none;
+  text-align: left;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.logout-button:hover {
+  background: #f0f5f2;
+}
+
+.semester-info {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid #e3e7e4;
+  font-size: 12px;
+  color: #7b8581;
+}
+
+.student-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.student-header {
+  min-height: 90px;
+  background: #ffffff;
+  border-bottom: 1px solid #e3e7e4;
+  padding: 20px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.student-header h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.student-header p {
+  margin: 5px 0 0;
+  color: #7b8581;
+  font-size: 14px;
+}
+
+.student-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #e6f3ed;
+  color: #187957;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.student-content {
+  padding: 30px 32px;
+}
+
+@media (max-width: 800px) {
+  .student-sidebar {
+    width: 180px;
+  }
+
+  .student-header,
+  .student-content {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}

@@ -1,0 +1,220 @@
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.dashboard-card {
+  background: #ffffff;
+  border: 1px solid #e3e7e4;
+  border-radius: 10px;
+  padding: 24px;
+}
+
+.time-clock-card {
+  min-height: 300px;
+}
+
+.card-heading,
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-heading {
+  color: #7b8581;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.card-label {
+  color: #7b8581;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.clock-job {
+  margin-top: 28px;
+}
+
+.clock-job label {
+  display: block;
+  margin-bottom: 7px;
+  color: #7b8581;
+  font-size: 13px;
+}
+
+.clock-job select {
+  width: 100%;
+  max-width: 360px;
+  padding: 10px;
+  border: 1px solid #d8dedb;
+  border-radius: 6px;
+  color: #26322f;
+  font-size: 14px;
+  background: #ffffff;
+}
+
+.clock-status {
+  margin: 32px 0;
+}
+
+.clock-status h2 {
+  margin-bottom: 6px;
+  font-size: 20px;
+}
+
+.clock-status p {
+  margin: 0;
+  color: #7b8581;
+}
+
+.primary-button {
+  width: 100%;
+  max-width: 360px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 6px;
+  background: #17805c;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary-button:hover {
+  background: #126b4c;
+}
+
+.primary-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hours-summary-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.hours-summary {
+  display: flex;
+  flex-direction: column;
+  margin: 30px 0;
+}
+
+.hours-summary strong {
+  font-size: 36px;
+}
+
+.hours-summary span {
+  color: #7b8581;
+  font-size: 13px;
+}
+
+.text-button {
+  width: fit-content;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #17805c;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.upcoming-card {
+  min-height: 260px;
+}
+
+.section-heading h2 {
+  margin: 5px 0 0;
+  font-size: 19px;
+}
+
+.empty-dashboard-state {
+  margin-top: 28px;
+  padding: 32px 15px;
+  border: 1px dashed #ccd4d0;
+  border-radius: 7px;
+  color: #7b8581;
+  text-align: center;
+}
+
+.shift-card-dashboard h2 {
+  margin: 8px 0;
+}
+
+.shift-card-dashboard p {
+  color: #7b8581;
+  line-height: 1.5;
+}
+
+.secondary-button {
+  margin-top: 16px;
+  padding: 10px 16px;
+  border: 1px solid #17805c;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #17805c;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Dashboard data states */
+
+.dashboard-message {
+  margin: 0 0 18px;
+  padding: 10px 14px;
+  border: 1px solid #d8dedb;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.upcoming-shift-list {
+  margin-top: 22px;
+}
+
+.upcoming-shift {
+  padding: 14px 0;
+  border-bottom: 1px solid #e3e7e4;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.upcoming-shift:last-child {
+  border-bottom: none;
+}
+
+.upcoming-shift div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.upcoming-shift div span,
+.upcoming-shift > span {
+  color: #7b8581;
+  font-size: 13px;
+}
+
+@media (max-width: 950px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.clock-out-button {
+  width: 100%;
+  max-width: 360px;
+  padding: 12px 18px;
+  border: 1px solid #b84a4a;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #b84a4a;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.clock-out-button:hover {
+  background: #fff5f5;
+}

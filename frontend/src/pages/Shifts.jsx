@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import api from "../api/backendApi.js";
+import StudentLayout from "../components/StudentLayout";
 import "./Shifts.css";
 
 function Shifts() {
   const [myShifts, setMyShifts] = useState([]);
   const [openShifts, setOpenShifts] = useState([]);
   const [employments, setEmployments] = useState([]);
-  const [employmentId, setEmploymentId] = useState("");
   const [message, setMessage] = useState("");
 
   const loadMyShifts = () => {
@@ -45,10 +45,6 @@ function Shifts() {
     api.get("/employments/me")
       .then((response) => {
         setEmployments(response.data);
-
-        if (response.data.length > 0) {
-          setEmploymentId(response.data[0].employmentId);
-        }
       })
       .catch((error) => {
         console.error(error);
@@ -98,137 +94,211 @@ function Shifts() {
       });
   };
 
-  const claimShift = (shiftId) => {
-    if (!employmentId) {
-      setMessage("You do not have an employment available for this shift.");
-      return;
+  const claimShift = (shift) => {
+    const matchingEmployment = employments.find(
+        (employment) => employment.jobId === shift.jobId
+    );
+
+    if (!matchingEmployment) {
+        setMessage("You do not have an employment available for this shift.");
+        return;
     }
 
-    api.post(`/shifts/${shiftId}/claim`, {
-      employmentId: employmentId
+    api.post(`/shifts/${shift.id}/claim`, {
+        employmentId: matchingEmployment.employmentId
     })
-      .then(() => {
+        .then(() => {
         setMessage("Shift claimed successfully.");
         loadMyShifts();
         loadOpenShifts();
-      })
-      .catch((error) => {
+        })
+        .catch((error) => {
         console.error(error);
-        setMessage("Could not claim shift.");
-      });
-  };
 
-  return (
-    <div className="shifts-page">
-      <h1>My Shifts</h1>
+        const errorCode = error.response?.data?.error;
 
-      {message && <p>{message}</p>}
+        if (errorCode === "SHIFT_ALREADY_CLAIMED") {
+            setMessage("This shift has already been claimed.");
+        } else if (errorCode === "OVERLAPPING_SHIFT") {
+            setMessage("You already have a shift during this time.");
+        } else if (errorCode === "WRONG_JOB") {
+            setMessage("You are not eligible to work this job.");
+        } else if (errorCode === "CANNOT_CLAIM_OWN_SHIFT") {
+            setMessage("You cannot claim your own offered shift.");
+        } else {
+            setMessage("Could not claim shift.");
+        }
 
-      {myShifts.length === 0 ? (
-        <p>You do not currently have any shifts.</p>
-      ) : (
-        myShifts.map((shift) => (
-          <div className="shift-card" key={shift.id}>
-            <p>
-              <strong>Start:</strong>{" "}
-              {new Date(shift.startAt).toLocaleString()}
-            </p>
+        loadOpenShifts();
+        });
+    };
+    const formatDate = (date) => {
+        return new Date(date).toLocaleDateString([], {
+            weekday: "short",
+            month: "short",
+            day: "numeric"
+        });
+    };
 
-            <p>
-              <strong>End:</strong>{" "}
-              {new Date(shift.endAt).toLocaleString()}
-            </p>
+    const formatTime = (date) => {
+        return new Date(date).toLocaleTimeString([], {
+            hour: "numeric",
+            minute: "2-digit"
+        });
+    };
 
-            <p>
-              <strong>Status:</strong> {shift.status}
-            </p>
-
-            {shift.offer?.reason && (
-              <p>
-                <strong>Reason:</strong> {shift.offer.reason}
-              </p>
+    return (
+        <StudentLayout
+            title="Shift Management"
+            subtitle="Manage your scheduled shifts and pick up available shifts."
+        >
+            {message && (
+            <div className="shift-message">
+                {message}
+            </div>
             )}
 
-            {shift.status === "SCHEDULED" && (
-              <button onClick={() => offerShift(shift.id)}>
-                Offer Shift
-              </button>
+            <section className="shift-section">
+            <div className="shift-section-heading">
+                <div>
+                <span className="shift-label">YOUR SCHEDULE</span>
+                <h2>My Shifts</h2>
+                </div>
+
+                <span className="shift-count">
+                {myShifts.length} {myShifts.length === 1 ? "shift" : "shifts"}
+                </span>
+            </div>
+
+            {myShifts.length === 0 ? (
+                <div className="shift-empty">
+                You do not currently have any shifts.
+                </div>
+            ) : (
+                <div className="shift-list">
+                {myShifts.map((shift) => (
+                    <div className="student-shift-card" key={shift.id}>
+                    <div className="shift-date">
+                        <strong>{formatDate(shift.startAt)}</strong>
+
+                        <span>
+                        {formatTime(shift.startAt)} – {formatTime(shift.endAt)}
+                        </span>
+                    </div>
+
+                    <div className="shift-details">
+                        <span
+                        className={
+                            shift.status === "OFFERED"
+                            ? "shift-status offered"
+                            : "shift-status scheduled"
+                        }
+                        >
+                        {shift.status === "OFFERED"
+                            ? "Offered"
+                            : "Scheduled"}
+                        </span>
+
+                        {shift.offer?.reason && (
+                        <p>
+                            <strong>Reason:</strong> {shift.offer.reason}
+                        </p>
+                        )}
+                    </div>
+
+                    <div className="shift-actions">
+                        {shift.status === "SCHEDULED" && (
+                        <button
+                            className="offer-button"
+                            onClick={() => offerShift(shift.id)}
+                        >
+                            Offer Shift
+                        </button>
+                        )}
+
+                        {shift.status === "OFFERED" && (
+                        <button
+                            className="withdraw-button"
+                            onClick={() => withdrawOffer(shift.id)}
+                        >
+                            Withdraw Offer
+                        </button>
+                        )}
+                    </div>
+                    </div>
+                ))}
+                </div>
             )}
+            </section>
 
-            {shift.status === "OFFERED" && (
-              <button onClick={() => withdrawOffer(shift.id)}>
-                Withdraw Offer
-              </button>
+            <section className="shift-section">
+            <div className="shift-section-heading">
+                <div>
+                <span className="shift-label">AVAILABLE SHIFTS</span>
+                <h2>Open Shifts</h2>
+                </div>
+
+                <span className="shift-count">
+                    {openShifts.length} available
+                </span>
+            </div>
+
+            {openShifts.length === 0 ? (
+                <div className="shift-empty">
+                No open shifts are currently available.
+                </div>
+            ) : (
+                <div className="shift-list">
+                {openShifts.map((shift) => (
+                    <div className="student-shift-card" key={shift.id}>
+                    <div className="shift-date">
+                        <strong>{formatDate(shift.startAt)}</strong>
+
+                        <span>
+                        {formatTime(shift.startAt)} – {formatTime(shift.endAt)}
+                        </span>
+                    </div>
+
+                    <div className="shift-details">
+                        <strong className="shift-job">
+                        {shift.jobTitle}
+                        </strong>
+
+                        {shift.reason && (
+                        <p>
+                            <strong>Reason:</strong> {shift.reason}
+                        </p>
+                        )}
+
+                        <span
+                        className={
+                            shift.eligible
+                            ? "eligibility eligible"
+                            : "eligibility not-eligible"
+                        }
+                        >
+                        {shift.eligible ? "Eligible" : "Not Eligible"}
+                        </span>
+                    </div>
+
+                    <div className="shift-actions">
+                        <button
+                        className="pickup-button"
+                        onClick={() => claimShift(shift)}
+                        disabled={!shift.eligible}
+                        >
+                        {shift.eligible
+                            ? "Pick Up Shift"
+                            : "Not Eligible"}
+                        </button>
+                    </div>
+                    </div>
+                ))}
+                </div>
             )}
-          </div>
-        ))
-      )}
-
-      <hr />
-
-      <h1>Open Shifts</h1>
-
-      {employments.length > 1 && (
-        <div className="employment-selector">
-          <label htmlFor="employment">Job: </label>
-
-          <select
-            id="employment"
-            value={employmentId}
-            onChange={(event) => setEmploymentId(event.target.value)}
-          >
-            {employments.map((employment) => (
-              <option
-                key={employment.employmentId}
-                value={employment.employmentId}
-              >
-                {employment.jobTitle}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-
-      {openShifts.length === 0 ? (
-        <p>No open shifts are currently available.</p>
-      ) : (
-        openShifts.map((shift) => (
-        <div className="shift-card" key={shift.id}>
-            <p>
-            <strong>Job:</strong> {shift.jobTitle}
-            </p>
-
-            <p>
-            <strong>Start:</strong>{" "}
-            {new Date(shift.startAt).toLocaleString()}
-            </p>
-
-            <p>
-            <strong>End:</strong>{" "}
-            {new Date(shift.endAt).toLocaleString()}
-            </p>
-
-            {shift.reason && (
-            <p>
-                <strong>Reason:</strong> {shift.reason}
-            </p>
-            )}
-
-            <p>
-            <strong>Eligible:</strong> {shift.eligible ? "Yes" : "No"}
-            </p>
-
-            <button
-            onClick={() => claimShift(shift.id)}
-            disabled={!shift.eligible}
-            >
-            {shift.eligible ? "Pick Up Shift" : "Not Eligible"}
-            </button>
-        </div>
-        ))
-      )}
-    </div>
-  );
+            </section>
+        </StudentLayout>
+    );
 }
 
 export default Shifts;
