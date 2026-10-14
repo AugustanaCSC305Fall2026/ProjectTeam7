@@ -6,6 +6,7 @@ import NotFound from "./pages/NotFound";
 import Shifts from "./pages/Shifts";
 import Hours from "./pages/Hours";
 import Home from "./pages/Home";
+import Calendar from "./pages/Calendar";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 
@@ -32,7 +33,11 @@ const router = createBrowserRouter([
   },
   {
   path: "/shifts",
-  element: <Shifts />,
+  element: (
+    <ProtectedRoute>
+      <Shifts />
+    </ProtectedRoute>
+    ),
   },
   {
   path: "/hours",
@@ -40,7 +45,15 @@ const router = createBrowserRouter([
     <ProtectedRoute>
       <Hours />
     </ProtectedRoute>
-  ),
+    ),
+  },
+  {
+  path: "/calendar",
+  element: (
+    <ProtectedRoute>
+      <Calendar />
+    </ProtectedRoute>
+    ),
   },
   {
     path: "*",

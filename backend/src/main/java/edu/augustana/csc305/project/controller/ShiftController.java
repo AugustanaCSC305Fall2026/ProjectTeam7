@@ -2,6 +2,7 @@ package edu.augustana.csc305.project.controller;
 
 import edu.augustana.csc305.project.dto.OpenShiftDto;
 import edu.augustana.csc305.project.dto.ShiftDto;
+import edu.augustana.csc305.project.model.Shift;
 import edu.augustana.csc305.project.security.AuthenticatedUser;
 import edu.augustana.csc305.project.service.ShiftService;
 import org.bson.types.ObjectId;
