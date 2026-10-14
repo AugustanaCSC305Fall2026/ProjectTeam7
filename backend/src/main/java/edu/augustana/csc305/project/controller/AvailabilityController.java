@@ -2,6 +2,7 @@ package edu.augustana.csc305.project.controller;
 
 import edu.augustana.csc305.project.dto.AvailabilityRequest;
 import edu.augustana.csc305.project.dto.AvailabilityResponse;
+import edu.augustana.csc305.project.dto.SupervisorAvailabilityDto;
 import edu.augustana.csc305.project.security.AuthenticatedUser;
 import edu.augustana.csc305.project.service.AvailabilityService;
 import org.bson.types.ObjectId;
@@ -10,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/availability")
 public class AvailabilityController {
@@ -17,6 +20,11 @@ public class AvailabilityController {
 
     public AvailabilityController(AvailabilityService availabilityService) {
         this.availabilityService = availabilityService;
+    }
+
+    @GetMapping
+    public List<SupervisorAvailabilityDto> getAllAvailability() {
+        return availabilityService.getAllForSupervisor();
     }
 
     @GetMapping("/me")
