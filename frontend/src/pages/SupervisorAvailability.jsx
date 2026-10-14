@@ -13,10 +13,13 @@ function SupervisorAvailability() {
         const response = await api.get("/availability");
         setEmployees(response.data);
       } catch (err) {
-        setError(
-          err.response?.data?.message ||
-            "Unable to load employee availability."
-        );
+        const status = err.response?.status;
+        const defaultMessage = status === 401
+          ? "Your session has expired. Please sign in again."
+          : status === 403
+            ? "You do not have permission to view employee availability."
+            : "Unable to load employee availability.";
+        setError(err.response?.data?.message || defaultMessage);
       } finally {
         setLoading(false);
       }

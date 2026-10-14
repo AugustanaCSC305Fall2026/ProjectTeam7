@@ -33,7 +33,7 @@ public class AvailabilityService {
 
     public AvailabilityResponse getForUser(ObjectId userId) {
         List<AvailabilityWindowDto> windows = repository.findByUserId(userId).stream()
-                .sorted(Comparator.comparingInt(window -> DayOfWeek.valueOf(window.getDayOfWeek()).getValue()))
+                .sorted(Comparator.comparingInt(window -> parseDay(window.getDayOfWeek()).getValue()))
                 .map(window -> new AvailabilityWindowDto(
                         window.getDayOfWeek(), window.getStartTime(), window.getEndTime()))
                 .toList();
@@ -64,7 +64,7 @@ public class AvailabilityService {
                 List<AvailabilityWindowDto> windows = entry.getValue().stream()
                         .sorted(Comparator
                                 .comparingInt((Availability window) ->
-                                        DayOfWeek.valueOf(window.getDayOfWeek()).getValue())
+                                        parseDay(window.getDayOfWeek()).getValue())
                                 .thenComparing(Availability::getStartTime))
                         .map(window -> new AvailabilityWindowDto(
                                 window.getDayOfWeek(),
