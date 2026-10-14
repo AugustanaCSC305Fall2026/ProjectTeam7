@@ -32,4 +32,8 @@ public class AvailabilityRepository {
             availabilities.insertMany(windows);
         }
     }
+
+    public List<Availability> findAll() {
+        return availabilities.find().into(new ArrayList<>());
+    }
 }
