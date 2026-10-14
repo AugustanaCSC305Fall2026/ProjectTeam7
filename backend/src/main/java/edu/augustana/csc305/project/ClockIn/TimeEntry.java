@@ -3,6 +3,8 @@ package edu.augustana.csc305.project.ClockIn;
 import org.bson.types.ObjectId;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TimeEntry {
 
@@ -13,6 +15,8 @@ public class TimeEntry {
     private Instant clockInTime;
     private Instant clockOutTime;
     private  long totalSeconds;
+    private boolean onBreak;
+    private List<BreakEntry> breaks = new ArrayList<>();
 
     public  TimeEntry() {}
 
@@ -50,5 +54,9 @@ public class TimeEntry {
     public void setTotalSeconds(long totalSeconds) {
         this.totalSeconds = totalSeconds;
     }
+    public boolean isOnBreak(){return  onBreak;}
+    public  void setOnBreak(boolean onBreak){this.onBreak = onBreak;}
+    public  List<BreakEntry> getBreaks() { return  breaks;}
+    public void setBreaks(List<BreakEntry> breaks){this.breaks = breaks}
 
 }

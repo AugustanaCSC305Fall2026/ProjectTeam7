@@ -26,4 +26,11 @@ public class TimeEntryControl {
         return service.clockOut(mockUser());
     }
 
+    public TimeEntry startBreak(){
+        return service.startBreak(mockUser());
+    }
+    public TimeEntry endBreak(){
+        return service.endBreak(mockUser());
+    }
+
 }
