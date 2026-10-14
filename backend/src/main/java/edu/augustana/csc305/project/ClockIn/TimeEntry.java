@@ -57,6 +57,6 @@ public class TimeEntry {
     public boolean isOnBreak(){return  onBreak;}
     public  void setOnBreak(boolean onBreak){this.onBreak = onBreak;}
     public  List<BreakEntry> getBreaks() { return  breaks;}
-    public void setBreaks(List<BreakEntry> breaks){this.breaks = breaks}
+    public void setBreaks(List<BreakEntry> breaks){this.breaks = breaks;}
 
 }

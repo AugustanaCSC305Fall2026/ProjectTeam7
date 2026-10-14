@@ -10,11 +10,12 @@
 }
 
 .student-sidebar {
-  width: 230px;
+  width: 280px;
+  flex: 0 0 280px;
   min-height: 100vh;
   background: #ffffff;
   border-right: 1px solid #e3e7e4;
-  padding: 28px 20px;
+  padding: 32px 28px;
   display: flex;
   flex-direction: column;
 }
@@ -95,20 +96,28 @@
 }
 
 .sidebar-bottom {
-  margin-top: auto;
+  margin-top: clamp(36px, 7vh, 72px);
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
+.sidebar-bottom a,
+.sidebar-bottom .logout-button {
+  padding-left: 0;
+}
+
 .logout-button {
+  width: 100%;
   background: transparent;
   color: #56615d;
   border: none;
+  border-radius: 7px;
   text-align: left;
   padding: 10px 12px;
   cursor: pointer;
   font-size: 14px;
+  font-family: inherit;
 }
 
 .logout-button:hover {
@@ -132,7 +141,7 @@
   min-height: 90px;
   background: #ffffff;
   border-bottom: 1px solid #e3e7e4;
-  padding: 20px 32px;
+  padding: 24px 48px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -169,12 +178,16 @@
 }
 
 .student-content {
-  padding: 30px 32px;
+  width: 100%;
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 36px 48px 48px;
 }
 
 @media (max-width: 800px) {
   .student-sidebar {
-    width: 180px;
+    width: 220px;
+    flex-basis: 220px;
   }
 
   .student-header,
