@@ -21,3 +21,35 @@
   color: #687570;
   text-align: center;
 }
+
+.availability-message,
+.availability-card {
+  padding: 1.25rem;
+  border: 1px solid #dce5e1;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.availability-error {
+  color: #b42318;
+  background: #fff5f4;
+}
+
+.availability-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.availability-card h3 {
+  margin: 0 0 0.75rem;
+  color: #174b83;
+}
+
+.availability-card ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.availability-card li + li {
+  margin-top: 0.4rem;
+}
