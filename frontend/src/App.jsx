@@ -15,6 +15,7 @@ import SupervisorCorrections from "./pages/SupervisorCorrections";
 import SupervisorSchedule from "./pages/SupervisorSchedule";
 import SupervisorAvailability from "./pages/SupervisorAvailability";
 import SupervisorAssignments from "./pages/SupervisorAssignments";
+import Availability from "./pages/Availability";
 
 /*
  * We use the react-router-dom library to load pages based
@@ -63,6 +64,14 @@ const router = createBrowserRouter([
     <ProtectedRoute>
       <Calendar />
     </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/availability",
+    element: (
+      <ProtectedRoute>
+        <Availability />
+      </ProtectedRoute>
     ),
   },
   {

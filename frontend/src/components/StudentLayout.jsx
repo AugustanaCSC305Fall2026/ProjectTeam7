@@ -6,6 +6,7 @@ const studentNavItems = [
   { to: "/", label: "Dashboard" },
   { to: "/hours", label: "Hours" },
   { to: "/calendar", label: "Calendar" },
+  { to: "/availability", label: "Availability" },
   { to: "/shifts", label: "Shift Management" },
 ];
 
