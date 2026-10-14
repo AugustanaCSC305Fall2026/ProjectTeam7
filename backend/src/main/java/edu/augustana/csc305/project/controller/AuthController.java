@@ -1,6 +1,7 @@
 package edu.augustana.csc305.project.controller;
 
 import edu.augustana.csc305.project.dto.UserDto;
+import edu.augustana.csc305.project.dto.RegisterRequest;
 import edu.augustana.csc305.project.model.User;
 import edu.augustana.csc305.project.repository.UserRepository;
 import edu.augustana.csc305.project.security.LoginRequest;
@@ -11,6 +12,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Locale;
 
 /**
  * The controller for handling authentication requests. Defines our /auth routes.
@@ -57,6 +61,27 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        String firstName = clean(request.firstName());
+        String lastName = clean(request.lastName());
+        String email = request.email() == null ? "" : request.email().trim().toLowerCase(Locale.ROOT);
+        String password = request.password();
+
+        if (firstName.isBlank() || lastName.isBlank() || !email.contains("@")
+                || password == null || password.length() < 8) {
+            return ResponseEntity.badRequest().body("INVALID_REGISTRATION_DATA");
+        }
+        if (userRepository.findByEmail(email).isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("EMAIL_ALREADY_REGISTERED");
+        }
+
+        User user = new User(null, firstName, lastName, email,
+                passwordEncoder.encode(password), List.of("USER"));
+        userRepository.storeUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(toUserDto(user));
+    }
+
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void logout() {
@@ -73,5 +98,9 @@ public class AuthController {
             lastName = nameParts.length > 1 ? nameParts[1] : "";
         }
         return new UserDto(user.getId().toHexString(), firstName, lastName, user.getRoles());
+    }
+
+    private String clean(String value) {
+        return value == null ? "" : value.trim();
     }
 }

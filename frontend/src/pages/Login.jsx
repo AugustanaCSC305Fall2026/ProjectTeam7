@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import api from '../api/backendApi.js';
 import './Login.css';
+import logo from '../assets/augustana-logo.png';
 
 
 /*
@@ -10,6 +11,7 @@ import './Login.css';
  */
 function Login() {
     const navigate = useNavigate();
+    const location = useLocation();
   // This component needs to track state, namely the user's credentials
   // and a possible error message.
   //
@@ -49,7 +51,7 @@ function Login() {
         user?.roles?.includes("ADMIN") ? "/supervisor" : "/",
         { replace: true }
       );
-    } catch (err) {
+    } catch {
       // On failure, set an error message.
       setError('Invalid email or password.');
     }
@@ -57,20 +59,39 @@ function Login() {
 
   // We are now ready to construct and return the login page HTML.
   return (
-    <div id="loginPage">
-      <h1>Login</h1>
-      <form onSubmit={handleSubmit}>
-        <div className="input">
-          <label htmlFor="email">Email:</label>
-          <input type="text" id="email" name="email" onChange={handleChange} className="credentialField" />
+    <div className="auth-page">
+      <main className="auth-card" id="loginPage">
+        <div className="auth-brand">
+          <img src={logo} alt="Augustana College" />
+          <div>
+            <strong>cLockedIn</strong>
+            <span>Campus work</span>
+          </div>
         </div>
-        <div className="input">
-          <label htmlFor="password">Password:</label>
-          <input type="password" id="password" name="password" onChange={handleChange} className="credentialField" />
+
+        <div className="auth-heading">
+          <p className="auth-eyebrow">STUDENT WORK PORTAL</p>
+          <h1>Welcome back</h1>
+          <p>Sign in to manage your campus work.</p>
         </div>
-        {error && <p className="error">{error}</p>}
-        <button type="submit" className="submit">Submit</button>
-      </form>
+
+        {location.state?.message && <p className="success">{location.state.message}</p>}
+        <form onSubmit={handleSubmit}>
+          <div className="input">
+            <label htmlFor="email">Email</label>
+            <input type="email" id="email" name="email" value={credentials.email}
+              onChange={handleChange} className="credentialField" autoComplete="email" required />
+          </div>
+          <div className="input">
+            <label htmlFor="password">Password</label>
+            <input type="password" id="password" name="password" value={credentials.password}
+              onChange={handleChange} className="credentialField" autoComplete="current-password" required />
+          </div>
+          {error && <p className="error">{error}</p>}
+          <button type="submit" className="submit">Sign in</button>
+        </form>
+        <p className="auth-switch">New to cLockedIn? <Link to="/create-account">Create an account</Link></p>
+      </main>
     </div>
   );
 };

@@ -47,6 +47,7 @@ import java.util.List;
                          */
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers("/api/v1/auth/login").permitAll()
+                        .requestMatchers("/api/v1/auth/register").permitAll()
                         .requestMatchers("/api/v1/public/**").permitAll()
                         .requestMatchers("/api/v1/healthCheck").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/shifts").hasRole("ADMIN")
@@ -54,6 +55,7 @@ import java.util.List;
                         .requestMatchers(HttpMethod.GET, "/api/v1/availability").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/admin/corrections/pending").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/admin/corrections/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated() // All other requests need a token
                 )
                 /*

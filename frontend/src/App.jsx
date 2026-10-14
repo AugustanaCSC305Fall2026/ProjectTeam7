@@ -1,7 +1,7 @@
-import { createBrowserRouter, RouterProvider, Link } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import GettingStarted from "./pages/GettingStarted";
 import Login from "./pages/Login";
+import CreateAccount from "./pages/CreateAccount";
 import NotFound from "./pages/NotFound";
 import Shifts from "./pages/Shifts";
 import Hours from "./pages/Hours";
@@ -14,6 +14,7 @@ import SupervisorDashboard from "./pages/SupervisorDashboard";
 import SupervisorCorrections from "./pages/SupervisorCorrections";
 import SupervisorSchedule from "./pages/SupervisorSchedule";
 import SupervisorAvailability from "./pages/SupervisorAvailability";
+import SupervisorAssignments from "./pages/SupervisorAssignments";
 
 /*
  * We use the react-router-dom library to load pages based
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/create-account",
+    element: <CreateAccount />,
   },
   {
   path: "/shifts",
@@ -72,6 +77,10 @@ const router = createBrowserRouter([
     {
       path: "schedule",
       element: <SupervisorSchedule />,
+    },
+    {
+      path: "assignments",
+      element: <SupervisorAssignments />,
     },
     {
       path: "corrections",

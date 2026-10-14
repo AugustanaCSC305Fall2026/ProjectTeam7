@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 import org.bson.types.ObjectId;
 
 import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Interacts with the "users" collection in the backing database. */
 @Repository public class UserRepository {
@@ -28,6 +30,14 @@ import java.util.Optional;
 
     public long count() {
         return users.countDocuments();
+    }
+
+    public List<User> findAll() {
+        List<User> results = new ArrayList<>();
+        for (User user : users.find()) {
+            results.add(user);
+        }
+        return results;
     }
 
     public void storeUser(User user) {

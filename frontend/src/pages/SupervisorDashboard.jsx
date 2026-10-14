@@ -12,6 +12,18 @@ function SupervisorDashboard() {
       <div className="supervisor-dashboard__actions">
         <Link
           className="supervisor-dashboard__card"
+          to="/supervisor/assignments"
+        >
+          <span className="supervisor-dashboard__card-title">
+            Assign a job
+          </span>
+          <span className="supervisor-dashboard__card-description">
+            Connect a student to an active campus job.
+          </span>
+        </Link>
+
+        <Link
+          className="supervisor-dashboard__card"
           to="/supervisor/schedule"
         >
           <span className="supervisor-dashboard__card-title">

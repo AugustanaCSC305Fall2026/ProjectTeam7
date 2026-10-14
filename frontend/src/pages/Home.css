@@ -1,18 +1,26 @@
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 20px;
+  grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 28px;
+  align-items: stretch;
 }
 
 .dashboard-card {
+  min-width: 0;
+  height: 100%;
   background: #ffffff;
   border: 1px solid #e3e7e4;
   border-radius: 10px;
-  padding: 24px;
+  padding: 28px;
 }
 
 .time-clock-card {
-  min-height: 300px;
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .card-heading,
@@ -23,6 +31,7 @@
 }
 
 .card-heading {
+  width: 100%;
   color: #7b8581;
   font-size: 12px;
   font-weight: 700;
@@ -57,8 +66,13 @@
   background: #ffffff;
 }
 
+.clock-job {
+  width: 100%;
+  max-width: 500px;
+}
+
 .clock-status {
-  margin: 32px 0;
+  margin: 42px 0 36px;
 }
 
 .clock-status h2 {
@@ -95,12 +109,16 @@
 .hours-summary-card {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  text-align: center;
 }
 
 .hours-summary {
   display: flex;
   flex-direction: column;
-  margin: 30px 0;
+  align-items: center;
+  align-self: center;
+  margin: 48px 0;
 }
 
 .hours-summary strong {
@@ -123,7 +141,7 @@
 }
 
 .upcoming-card {
-  min-height: 260px;
+  min-height: 300px;
 }
 
 .section-heading h2 {
@@ -141,12 +159,19 @@
 }
 
 .shift-card-dashboard h2 {
-  margin: 8px 0;
+  margin: 12px 0 8px;
 }
 
 .shift-card-dashboard p {
   color: #7b8581;
   line-height: 1.5;
+  max-width: 320px;
+}
+
+.shift-card-dashboard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .secondary-button {
@@ -201,6 +226,7 @@
 @media (max-width: 950px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
+    grid-template-rows: none;
   }
 }
 .clock-out-button {
@@ -213,6 +239,18 @@
   color: #b84a4a;
   font-weight: 600;
   cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .student-header,
+  .student-content {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .dashboard-card {
+    padding: 22px;
+  }
 }
 
 .clock-out-button:hover {
