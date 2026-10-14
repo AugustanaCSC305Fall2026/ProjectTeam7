@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import StudentLayout from "./StudentLayout";
 
 const supervisorNavItems = [
+  { to: "/supervisor/availability", label: "Availability" },
   { to: "/supervisor", label: "Dashboard", end: true },
   { to: "/supervisor/schedule", label: "Schedule" },
   { to: "/supervisor/corrections", label: "Time Corrections" },
