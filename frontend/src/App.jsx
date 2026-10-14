@@ -1,7 +1,7 @@
-import { createBrowserRouter, RouterProvider, Link } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import GettingStarted from "./pages/GettingStarted";
 import Login from "./pages/Login";
+import CreateAccount from "./pages/CreateAccount";
 import NotFound from "./pages/NotFound";
 import Shifts from "./pages/Shifts";
 import Hours from "./pages/Hours";
@@ -35,6 +35,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/create-account",
+    element: <CreateAccount />,
   },
   {
   path: "/shifts",
