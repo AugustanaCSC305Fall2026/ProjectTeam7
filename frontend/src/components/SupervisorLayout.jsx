@@ -3,6 +3,7 @@ import StudentLayout from "./StudentLayout";
 
 const supervisorNavItems = [
   { to: "/supervisor", label: "Dashboard", end: true },
+  { to: "/supervisor/assignments", label: "Job Assignments" },
   { to: "/supervisor/schedule", label: "Schedule" },
   { to: "/supervisor/corrections", label: "Time Corrections" },
 ];
@@ -14,7 +15,6 @@ function SupervisorLayout() {
       subtitle="Manage campus employment."
       sectionLabel="MANAGE"
       navItems={supervisorNavItems}
-      userLabel="Supervisor"
       showComingSoon={false}
       showProfileLink={false}
     >

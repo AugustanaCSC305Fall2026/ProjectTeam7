@@ -14,12 +14,24 @@ function StudentLayout({
   title,
   subtitle,
   sectionLabel = "MAIN",
-  userLabel = "Student",
+  userLabel,
   navItems = studentNavItems,
   showComingSoon = true,
   showProfileLink = true,
 }) {
   const navigate = useNavigate();
+  let storedUser = null;
+
+  try {
+    storedUser = JSON.parse(localStorage.getItem("user") || "null");
+  } catch {
+    storedUser = null;
+  }
+
+  const displayName = userLabel || [
+    storedUser?.firstName,
+    storedUser?.lastName,
+  ].filter(Boolean).join(" ") || storedUser?.name || "Student";
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -85,8 +97,8 @@ function StudentLayout({
           </div>
 
           <div className="student-user">
-            <div className="user-avatar">{userLabel.charAt(0)}</div>
-            <span>{userLabel}</span>
+            <div className="user-avatar">{displayName.charAt(0)}</div>
+            <span>{displayName}</span>
           </div>
         </header>
 

@@ -14,6 +14,7 @@ import SupervisorDashboard from "./pages/SupervisorDashboard";
 import SupervisorCorrections from "./pages/SupervisorCorrections";
 import SupervisorSchedule from "./pages/SupervisorSchedule";
 import SupervisorAvailability from "./pages/SupervisorAvailability";
+import SupervisorAssignments from "./pages/SupervisorAssignments";
 
 /*
  * We use the react-router-dom library to load pages based
@@ -76,6 +77,10 @@ const router = createBrowserRouter([
     {
       path: "schedule",
       element: <SupervisorSchedule />,
+    },
+    {
+      path: "assignments",
+      element: <SupervisorAssignments />,
     },
     {
       path: "corrections",
