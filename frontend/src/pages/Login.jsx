@@ -39,16 +39,16 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Call the login endpoint. On success, store the authorization
-      // token.
-      const response = await api.post('auth/login', credentials);
-      localStorage.setItem('token', response.data.token);
+      const response = await api.post("auth/login", credentials);
+      const { token, user } = response.data;
 
-      // ***
-      // ***  Instead of alert(...), redirect to authenticated home
-      // ***  screen (or wherever you want to go after login) here.
-      // ***
-      navigate('/',{ replace: true });
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      navigate(
+        user?.roles?.includes("ADMIN") ? "/supervisor" : "/",
+        { replace: true }
+      );
     } catch (err) {
       // On failure, set an error message.
       setError('Invalid email or password.');

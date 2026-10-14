@@ -1,0 +1,43 @@
+.supervisor-dashboard h2 {
+  margin: 0 0 8px;
+}
+
+.supervisor-dashboard__intro {
+  margin-bottom: 24px;
+  color: #7b8581;
+}
+
+.supervisor-dashboard__actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.supervisor-dashboard__card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px;
+  border: 1px solid #e3e7e4;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #26322f;
+  text-align: left;
+  text-decoration: none;
+}
+
+.supervisor-dashboard__card:hover {
+  border-color: #17805c;
+  background: #f8fbf9;
+}
+
+.supervisor-dashboard__card-title {
+  color: #194278;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.supervisor-dashboard__card-description {
+  color: #7b8581;
+  font-size: 14px;
+}
