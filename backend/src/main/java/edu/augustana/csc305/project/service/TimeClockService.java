@@ -96,6 +96,42 @@ public class TimeClockService {
         return entry;
     }
 
+    public TimeEntry startBreak(ObjectId userId) {
+        TimeEntry openEntry = timeEntryRepository.findOpenByUserId(userId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.CONFLICT, "NOT_CLOCKED_IN"));
+
+        if (openEntry.isOnBreak()) {
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT, "ALREADY_ON_BREAK");
+        }
+
+        return timeEntryRepository.startBreak(
+                        openEntry.getId(), userId, Instant.now())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.CONFLICT, "BREAK_STATE_CHANGED"));
+        }
+
+        public TimeEntry endBreak(ObjectId userId) {
+        TimeEntry openEntry = timeEntryRepository.findOpenByUserId(userId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.CONFLICT, "NOT_CLOCKED_IN"));
+
+        Instant breakStartedAt = openEntry.getBreakStartedAt();
+        if (!openEntry.isOnBreak() || breakStartedAt == null) {
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT, "NOT_ON_BREAK");
+        }
+
+        int additionalBreakMinutes = (int) Math.max(
+                0, Duration.between(breakStartedAt, Instant.now()).toMinutes());
+
+        return timeEntryRepository.endBreak(
+                        openEntry.getId(), userId, breakStartedAt, additionalBreakMinutes)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.CONFLICT, "BREAK_STATE_CHANGED"));
+        }
+
     public TimeEntry clockOut(ObjectId userId) {
         TimeEntry openEntry = timeEntryRepository.findOpenByUserId(userId)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -106,7 +142,10 @@ public class TimeClockService {
                 openEntry.getClockInAt(), clockOutAt).toMinutes();
         int workedMinutes = (int) Math.max(
                 0, elapsedMinutes - openEntry.getBreakMinutes());
-
+        if (openEntry.isOnBreak()) {
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT, "BREAK_IN_PROGRESS");
+                }
         return timeEntryRepository.clockOutOpenEntry(
                         openEntry.getId(), userId, clockOutAt, workedMinutes)
                 .orElseThrow(() -> new ResponseStatusException(

@@ -241,6 +241,39 @@
   cursor: pointer;
 }
 
+.clock-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.clock-actions button {
+  flex: 1;
+  max-width: 240px;
+}
+
+.clock-out-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.clock-out-button:disabled:hover {
+  background: #ffffff;
+}
+
+@media (max-width: 600px) {
+  .clock-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .clock-actions button {
+    width: 100%;
+  }
+}
+
 @media (max-width: 600px) {
   .student-header,
   .student-content {

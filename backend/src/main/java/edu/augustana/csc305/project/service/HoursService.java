@@ -67,6 +67,7 @@ public class HoursService {
                     timeEntry.getClockInAt(),
                     timeEntry.getClockOutAt(),
                     timeEntry.getBreakMinutes(),
+                    timeEntry.isOnBreak(),
                     timeEntry.getWorkedMinutes()
             ));
         }

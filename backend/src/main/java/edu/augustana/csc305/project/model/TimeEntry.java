@@ -19,6 +19,8 @@ public class TimeEntry {
     private EntrySource source;
     private int breakMinutes;
     private int workedMinutes;
+    private boolean onBreak;
+    private Instant breakStartedAt;
 
     public TimeEntry() {
     }
@@ -49,4 +51,12 @@ public class TimeEntry {
 
     public int getWorkedMinutes() { return workedMinutes; }
     public void setWorkedMinutes(int workedMinutes) { this.workedMinutes = workedMinutes; }
+
+    public boolean isOnBreak() { return onBreak; }
+    public void setOnBreak(boolean onBreak) { this.onBreak = onBreak; }
+
+    public Instant getBreakStartedAt() { return breakStartedAt; }
+    public void setBreakStartedAt(Instant breakStartedAt) {
+        this.breakStartedAt = breakStartedAt;
+    }
 }

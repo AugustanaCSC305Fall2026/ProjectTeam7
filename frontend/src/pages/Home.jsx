@@ -13,6 +13,7 @@ function Home() {
   const [totalMinutes, setTotalMinutes] = useState(0);
   const [message, setMessage] = useState("");
   const [isClockedIn, setIsClockedIn] = useState(false);
+  const [isOnBreak, setIsOnBreak] = useState(false);
   const [clockedInAt, setClockedInAt] = useState(null);
 
   useEffect(() => {
@@ -70,10 +71,12 @@ function Home() {
 
         if (openEntry) {
         setIsClockedIn(true);
+        setIsOnBreak(Boolean(openEntry.onBreak));
         setClockedInAt(openEntry.clockInAt);
         setEmploymentId(openEntry.employmentId);
         } else {
         setIsClockedIn(false);
+        setIsOnBreak(false);
         setClockedInAt(null);
         }
     } catch (error) {
@@ -107,6 +110,38 @@ function Home() {
         } else {
         setMessage("Could not clock in.");
         }
+    }
+  };
+
+    const handleStartBreak = async () => {
+    try {
+      setMessage("");
+      const response = await api.post("/me/time-entries/break/start");
+      setIsOnBreak(Boolean(response.data.onBreak));
+      setMessage("Break started.");
+    } catch (error) {
+      console.error(error);
+      setMessage(
+        error.response?.status === 409
+          ? "You cannot start a break in your current clock state."
+          : "Could not start break."
+      );
+    }
+  };
+
+  const handleEndBreak = async () => {
+    try {
+      setMessage("");
+      const response = await api.post("/me/time-entries/break/end");
+      setIsOnBreak(Boolean(response.data.onBreak));
+      setMessage("Break ended.");
+    } catch (error) {
+      console.error(error);
+      setMessage(
+        error.response?.status === 409
+          ? "You are not currently on a break."
+          : "Could not end break."
+      );
     }
   };
   const handleClockOut = async () => {
@@ -191,43 +226,62 @@ function Home() {
             </select>
           </div>
 
-    <div className="clock-status">
-        <h2>
-            {isClockedIn
-            ? "Currently Clocked In"
-            : "Currently Clocked Out"}
-        </h2>
+            <div className="clock-status">
+          <h2>
+            {isOnBreak
+              ? "On Break"
+              : isClockedIn
+                ? "Currently Clocked In"
+                : "Currently Clocked Out"}
+          </h2>
 
-        {isClockedIn ? (
-            <p>
-            Clocked in at{" "}
-            {clockedInAt
-                ? new Date(clockedInAt).toLocaleTimeString([], {
-                    hour: "numeric",
-                    minute: "2-digit"
-                })
-                : ""}
-            </p>
-        ) : (
+          {isClockedIn ? (
+            isOnBreak ? (
+              <p>Your break is in progress.</p>
+            ) : (
+              <p>
+                Clocked in at{" "}
+                {clockedInAt
+                  ? new Date(clockedInAt).toLocaleTimeString([], {
+                      hour: "numeric",
+                      minute: "2-digit"
+                    })
+                  : ""}
+              </p>
+            )
+          ) : (
             <p>Select your job and start your work session.</p>
-        )}
+          )}
         </div>
 
         {isClockedIn ? (
-        <button
-            className="clock-out-button"
-            onClick={handleClockOut}
-        >
-            Clock Out
-        </button>
+          <div className="clock-actions">
+            {isOnBreak ? (
+              <button className="primary-button" onClick={handleEndBreak}>
+                End Break
+              </button>
+            ) : (
+              <button className="primary-button" onClick={handleStartBreak}>
+                Start Break
+              </button>
+            )}
+
+            <button
+              className="clock-out-button"
+              onClick={handleClockOut}
+              disabled={isOnBreak}
+            >
+              Clock Out
+            </button>
+          </div>
         ) : (
-        <button
+          <button
             className="primary-button"
             onClick={handleClockIn}
             disabled={!employmentId}
-        >
+          >
             Clock In
-        </button>
+          </button>
         )}
         </section>
 
