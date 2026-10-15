@@ -8,8 +8,11 @@ import com.mongodb.client.model.Indexes;
 import edu.augustana.csc305.project.model.User;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.stereotype.Repository;
+import org.bson.types.ObjectId;
 
 import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 /** Interacts with the "users" collection in the backing database. */
 @Repository public class UserRepository {
@@ -29,6 +32,14 @@ import java.util.Optional;
         return users.countDocuments();
     }
 
+    public List<User> findAll() {
+        List<User> results = new ArrayList<>();
+        for (User user : users.find()) {
+            results.add(user);
+        }
+        return results;
+    }
+
     public void storeUser(User user) {
         users.insertOne(user);
     }
@@ -38,6 +49,11 @@ import java.util.Optional;
             return Optional.of(user);
         }
         return Optional.empty();
+    }
+
+    public Optional<User> findById(ObjectId userId) {
+        User user = users.find(Filters.eq("_id", userId)).first();
+        return Optional.ofNullable(user);
     }
 
 }

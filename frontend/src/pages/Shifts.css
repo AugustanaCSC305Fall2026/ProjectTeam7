@@ -1,0 +1,191 @@
+.shift-section {
+  margin-bottom: 22px;
+  padding: 24px;
+  border: 1px solid #e3e7e4;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.shift-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+
+.shift-label {
+  color: #7b8581;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.shift-section-heading h2 {
+  margin: 5px 0 0;
+  color: #26322f;
+  font-size: 19px;
+}
+
+.shift-count {
+  color: #7b8581;
+  font-size: 13px;
+}
+
+.shift-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.student-shift-card {
+  display: grid;
+  grid-template-columns: 220px 1fr auto;
+  gap: 28px;
+  align-items: center;
+  padding: 20px 14px;
+  border-bottom: 1px solid #edf0ee;
+}
+
+.student-shift-card:last-child {
+  border-bottom: none;
+}
+
+.shift-date {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.shift-date strong {
+  color: #26322f;
+  font-size: 14px;
+}
+
+.shift-date span {
+  color: #7b8581;
+  font-size: 13px;
+}
+
+.shift-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 7px;
+}
+
+.shift-details p {
+  margin: 0;
+  color: #7b8581;
+  font-size: 13px;
+}
+
+.shift-details p strong {
+  color: #56615d;
+}
+
+.shift-job {
+  color: #26322f;
+  font-size: 14px;
+}
+
+.shift-status,
+.eligibility {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 14px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.shift-status.scheduled,
+.eligibility.eligible {
+  background: #e6f3ed;
+  color: #17805c;
+}
+
+.shift-status.offered {
+  background: #fff4df;
+  color: #9a6715;
+}
+
+.eligibility.not-eligible {
+  background: #f1f2f1;
+  color: #7b8581;
+}
+
+.shift-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.offer-button,
+.withdraw-button,
+.pickup-button {
+  min-width: 120px;
+  padding: 9px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.offer-button {
+  border: 1px solid #17805c;
+  background: #ffffff;
+  color: #17805c;
+}
+
+.offer-button:hover {
+  background: #f0f7f4;
+}
+
+.withdraw-button {
+  border: 1px solid #c68a32;
+  background: #ffffff;
+  color: #9a6715;
+}
+
+.withdraw-button:hover {
+  background: #fffaf1;
+}
+
+.pickup-button {
+  border: 1px solid #17805c;
+  background: #17805c;
+  color: #ffffff;
+}
+
+.pickup-button:disabled {
+  border-color: #d8dedb;
+  background: #e9ecea;
+  color: #929a96;
+  cursor: not-allowed;
+}
+
+.shift-empty {
+  padding: 40px 20px;
+  border: 1px dashed #ccd4d0;
+  border-radius: 7px;
+  color: #7b8581;
+  text-align: center;
+}
+
+.shift-message {
+  margin-bottom: 20px;
+  padding: 11px 14px;
+  border: 1px solid #d8e4de;
+  border-radius: 6px;
+  background: #f7fbf9;
+  color: #56615d;
+  font-size: 13px;
+}
+
+@media (max-width: 850px) {
+  .student-shift-card {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .shift-actions {
+    justify-content: flex-start;
+  }
+}

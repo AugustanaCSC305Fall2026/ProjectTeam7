@@ -1,8 +1,21 @@
-import { createBrowserRouter, RouterProvider, Link } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import GettingStarted from "./pages/GettingStarted";
 import Login from "./pages/Login";
+import CreateAccount from "./pages/CreateAccount";
 import NotFound from "./pages/NotFound";
+import Shifts from "./pages/Shifts";
+import Hours from "./pages/Hours";
+import Home from "./pages/Home";
+import Calendar from "./pages/Calendar";
+import ProtectedRoute from "./components/ProtectedRoute";
+import RoleProtectedRoute from "./components/RoleProtectedRoute";
+import SupervisorLayout from "./components/SupervisorLayout";
+import SupervisorDashboard from "./pages/SupervisorDashboard";
+import SupervisorCorrections from "./pages/SupervisorCorrections";
+import SupervisorSchedule from "./pages/SupervisorSchedule";
+import SupervisorAvailability from "./pages/SupervisorAvailability";
+import SupervisorAssignments from "./pages/SupervisorAssignments";
+import Availability from "./pages/Availability";
 
 /*
  * We use the react-router-dom library to load pages based
@@ -15,12 +28,79 @@ import NotFound from "./pages/NotFound";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <GettingStarted />,
+    element:(
+    <ProtectedRoute>
+      <Home />
+    </ProtectedRoute>
+    ),
   },
   {
     path: "/login",
     element: <Login />,
   },
+  {
+    path: "/create-account",
+    element: <CreateAccount />,
+  },
+  {
+  path: "/shifts",
+  element: (
+    <ProtectedRoute>
+      <Shifts />
+    </ProtectedRoute>
+    ),
+  },
+  {
+  path: "/hours",
+  element: (
+    <ProtectedRoute>
+      <Hours />
+    </ProtectedRoute>
+    ),
+  },
+  {
+  path: "/calendar",
+  element: (
+    <ProtectedRoute>
+      <Calendar />
+    </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/availability",
+    element: (
+      <ProtectedRoute>
+        <Availability />
+      </ProtectedRoute>
+    ),
+  },
+  {
+  path: "/supervisor",
+  element: (
+    <RoleProtectedRoute requiredRole="ADMIN">
+      <SupervisorLayout />
+    </RoleProtectedRoute>
+  ),
+  children: [
+    { index: true, element: <SupervisorDashboard /> },
+    {
+      path: "schedule",
+      element: <SupervisorSchedule />,
+    },
+    {
+      path: "assignments",
+      element: <SupervisorAssignments />,
+    },
+    {
+      path: "corrections",
+      element: <SupervisorCorrections />,
+    },
+    {
+      path: "availability",
+      element: <SupervisorAvailability />,
+    },
+  ],
+},
   {
     path: "*",
     element: <NotFound />,

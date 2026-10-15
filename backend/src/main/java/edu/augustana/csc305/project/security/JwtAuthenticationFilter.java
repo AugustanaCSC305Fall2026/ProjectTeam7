@@ -9,6 +9,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import java.util.ArrayList;
 
 import java.io.IOException;
 import java.util.List;
@@ -45,8 +48,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 Claims claims = jwtService.parseToken(header.substring(BEARER_PREFIX.length()));
                 AuthenticatedUser user = new AuthenticatedUser(claims.get("id", String.class), claims.getSubject());
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(user, null, List.of());
+Object rolesClaim = claims.get("roles");
+List<GrantedAuthority> authorities = new ArrayList<>();
+
+if (rolesClaim instanceof List<?> roles) {
+    for (Object role : roles) {
+        if (role instanceof String roleName && !roleName.isBlank()) {
+            String authority = roleName.startsWith("ROLE_")
+                    ? roleName
+                    : "ROLE_" + roleName;
+            authorities.add(new SimpleGrantedAuthority(authority));
+        }
+    }
+}
+
+UsernamePasswordAuthenticationToken auth =
+        new UsernamePasswordAuthenticationToken(user, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(auth);
             } catch (JwtException | IllegalArgumentException e) {
                 // Bad or expired token: leave the request unauthenticated.

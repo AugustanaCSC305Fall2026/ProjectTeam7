@@ -29,10 +29,15 @@ import java.util.Date;
                 .subject(user.getEmail())
                 .claim("id", user.getId().toHexString())
                 .claim("email", user.getEmail())
+                .claim("roles", user.getRoles())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plus(jwtExpiration, ChronoUnit.MILLIS)))
                 .signWith(getSigningKey())
                 .compact();
+    }
+
+    public long getExpirationSeconds() {
+        return jwtExpiration / 1_000;
     }
 
     /**
