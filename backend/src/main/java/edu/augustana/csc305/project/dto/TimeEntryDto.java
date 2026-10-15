@@ -12,6 +12,7 @@ public record TimeEntryDto(
         Instant clockInAt,
         Instant clockOutAt,
         int breakMinutes,
+        boolean onBreak,
         int workedMinutes,
         EntrySource source
 ) {
@@ -25,6 +26,7 @@ public record TimeEntryDto(
                 entry.getClockInAt(),
                 entry.getClockOutAt(),
                 entry.getBreakMinutes(),
+                entry.isOnBreak(),
                 entry.getWorkedMinutes(),
                 entry.getSource()
         );

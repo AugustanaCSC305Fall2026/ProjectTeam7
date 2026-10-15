@@ -71,7 +71,8 @@ public class TimeEntryRepository {
                 Filters.and(
                         Filters.eq("_id", timeEntryId),
                         Filters.eq("userId", userId),
-                        Filters.eq("clockOutAt", null)
+                        Filters.eq("clockOutAt", null),
+                        Filters.ne("onBreak", true)
                 ),
                 Updates.combine(
                         Updates.set("clockOutAt", clockOutAt),
@@ -83,6 +84,56 @@ public class TimeEntryRepository {
 
         return Optional.ofNullable(updated);
     }
+
+    public Optional<TimeEntry> startBreak(
+        ObjectId timeEntryId,
+        ObjectId userId,
+        Instant breakStartedAt) {
+
+        TimeEntry updated = timeEntries.findOneAndUpdate(
+                Filters.and(
+                        Filters.eq("_id", timeEntryId),
+                        Filters.eq("userId", userId),
+                        Filters.eq("clockOutAt", null),
+                        Filters.ne("onBreak", true)
+                ),
+                Updates.combine(
+                        Updates.set("onBreak", true),
+                        Updates.set("breakStartedAt", breakStartedAt)
+                ),
+                new FindOneAndUpdateOptions()
+                        .returnDocument(ReturnDocument.AFTER)
+        );
+
+        return Optional.ofNullable(updated);
+    }
+
+    public Optional<TimeEntry> endBreak(
+            ObjectId timeEntryId,
+            ObjectId userId,
+            Instant expectedBreakStartedAt,
+            int additionalBreakMinutes) {
+
+        TimeEntry updated = timeEntries.findOneAndUpdate(
+                Filters.and(
+                        Filters.eq("_id", timeEntryId),
+                        Filters.eq("userId", userId),
+                        Filters.eq("clockOutAt", null),
+                        Filters.eq("onBreak", true),
+                        Filters.eq("breakStartedAt", expectedBreakStartedAt)
+                ),
+                Updates.combine(
+                        Updates.set("onBreak", false),
+                        Updates.unset("breakStartedAt"),
+                        Updates.inc("breakMinutes", additionalBreakMinutes)
+                ),
+                new FindOneAndUpdateOptions()
+                        .returnDocument(ReturnDocument.AFTER)
+        );
+
+        return Optional.ofNullable(updated);
+    }
+
 
     public Optional<TimeEntry> applyCorrection(
         ObjectId timeEntryId,

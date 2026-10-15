@@ -10,6 +10,7 @@ public record HoursEntryDto(
         Instant clockInAt,
         Instant clockOutAt,
         int breakMinutes,
+        boolean onBreak,
         int workedMinutes
 ) {
 }

@@ -40,4 +40,18 @@ public class TimeEntryController {
         ObjectId userId = new ObjectId(authenticatedUser.id());
         return TimeEntryDto.from(timeClockService.clockOut(userId));
     }
+
+        @PostMapping("/break/start")
+    public TimeEntryDto startBreak(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        ObjectId userId = new ObjectId(authenticatedUser.id());
+        return TimeEntryDto.from(timeClockService.startBreak(userId));
+    }
+
+    @PostMapping("/break/end")
+    public TimeEntryDto endBreak(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        ObjectId userId = new ObjectId(authenticatedUser.id());
+        return TimeEntryDto.from(timeClockService.endBreak(userId));
+    }
 }
