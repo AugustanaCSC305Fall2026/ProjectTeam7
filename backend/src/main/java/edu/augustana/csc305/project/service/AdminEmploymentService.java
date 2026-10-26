@@ -3,6 +3,7 @@ package edu.augustana.csc305.project.service;
 import edu.augustana.csc305.project.dto.AdminJobDto;
 import edu.augustana.csc305.project.dto.AdminUserDto;
 import edu.augustana.csc305.project.dto.AssignEmploymentRequest;
+import edu.augustana.csc305.project.dto.CreateJobRequest;
 import edu.augustana.csc305.project.dto.EmploymentAssignmentDto;
 import edu.augustana.csc305.project.model.Employment;
 import edu.augustana.csc305.project.model.Job;
@@ -49,6 +50,23 @@ public class AdminEmploymentService {
                         job.getDepartment(),
                         job.getDescription()))
                 .toList();
+    }
+    public AdminJobDto createJob(CreateJobRequest request) {
+        Job job = new Job(
+                null,
+                request.title(),
+                request.department(),
+                request.description()
+        );
+
+        jobRepository.storeJob(job);
+
+        return new AdminJobDto(
+                job.getId().toHexString(),
+                job.getTitle(),
+                job.getDepartment(),
+                job.getDescription()
+        );
     }
 
     public EmploymentAssignmentDto assign(AssignEmploymentRequest request) {
