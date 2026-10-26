@@ -15,6 +15,7 @@ import SupervisorCorrections from "./pages/SupervisorCorrections";
 import SupervisorSchedule from "./pages/SupervisorSchedule";
 import SupervisorAvailability from "./pages/SupervisorAvailability";
 import SupervisorAssignments from "./pages/SupervisorAssignments";
+import SupervisorJobs from "./pages/SupervisorJobs";
 import Availability from "./pages/Availability";
 
 /*
@@ -83,6 +84,10 @@ const router = createBrowserRouter([
   ),
   children: [
     { index: true, element: <SupervisorDashboard /> },
+    {
+      path: "jobs",
+      element: <SupervisorJobs />,
+    },
     {
       path: "schedule",
       element: <SupervisorSchedule />,
