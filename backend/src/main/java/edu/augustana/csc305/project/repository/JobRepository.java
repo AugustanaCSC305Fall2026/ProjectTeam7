@@ -3,6 +3,7 @@ package edu.augustana.csc305.project.repository;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import edu.augustana.csc305.project.model.Job;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
@@ -38,5 +39,12 @@ public class JobRepository {
 
     public void storeJob(Job job) {
         jobs.insertOne(job);
+    }
+
+    public void assignManager(ObjectId jobId, ObjectId managerId) {
+        jobs.updateOne(
+                Filters.eq("_id", jobId),
+                Updates.set("managerId", managerId)
+        );
     }
 }
