@@ -12,6 +12,8 @@ public record CorrectionRequestDto(
         Instant originalClockOutAt,
         Instant proposedClockInAt,
         Instant proposedClockOutAt,
+        Instant approvedClockInAt,
+        Instant approvedClockOutAt,
         String reason,
         CorrectionStatus status,
         String reviewNote,

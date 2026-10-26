@@ -1,4 +1,10 @@
 package edu.augustana.csc305.project.dto;
 
-public record ReviewCorrectionRequest(String reviewNote) {
+import java.time.Instant;
+
+public record ReviewCorrectionRequest(
+        String reviewNote,
+        Instant approvedClockInAt,
+        Instant approvedClockOutAt
+) {
 }

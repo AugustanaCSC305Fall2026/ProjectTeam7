@@ -11,9 +11,24 @@ function formatDateTime(value) {
   });
 }
 
+function toDateTimeLocal(value) {
+  if (!value) return "";
+
+  const date = new Date(value);
+  const localDate = new Date(
+    date.getTime() - date.getTimezoneOffset() * 60000
+  );
+  return localDate.toISOString().slice(0, 16);
+}
+
+function fromDateTimeLocal(value) {
+  return value ? new Date(value).toISOString() : null;
+}
+
 function SupervisorCorrections() {
   const [requests, setRequests] = useState([]);
   const [reviewNotes, setReviewNotes] = useState({});
+  const [reviewTimes, setReviewTimes] = useState({});
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState("");
   const [error, setError] = useState("");
@@ -47,17 +62,35 @@ function SupervisorCorrections() {
     loadRequests();
   }, []);
 
-  const reviewRequest = async (requestId, decision) => {
+    const reviewRequest = async (request, decision) => {
+    const requestId = request.correctionRequestId;
     setBusyId(requestId);
     setError("");
     setMessage("");
 
     try {
       const reviewNote = reviewNotes[requestId]?.trim() || "";
+      const payload = { reviewNote };
+
+      if (decision === "approve") {
+        const times = reviewTimes[requestId] || {};
+        const clockIn =
+          times.clockIn ?? toDateTimeLocal(request.proposedClockInAt);
+        const clockOut =
+          times.clockOut ?? toDateTimeLocal(request.proposedClockOutAt);
+
+        if (!clockIn || !clockOut) {
+          setError("Enter both final clock-in and clock-out times.");
+          return;
+        }
+
+        payload.approvedClockInAt = fromDateTimeLocal(clockIn);
+        payload.approvedClockOutAt = fromDateTimeLocal(clockOut);
+      }
 
       await api.patch(
         `/admin/corrections/${requestId}/${decision}`,
-        { reviewNote }
+        payload
       );
 
       setMessage(
@@ -111,6 +144,49 @@ function SupervisorCorrections() {
               {formatDateTime(request.proposedClockInAt)} –{" "}
               {formatDateTime(request.proposedClockOutAt)}
             </p>
+                      <div className="correction-time-fields">
+              <label htmlFor={`approved-in-${request.correctionRequestId}`}>
+                Final clock-in
+              </label>
+              <input
+                id={`approved-in-${request.correctionRequestId}`}
+                type="datetime-local"
+                value={
+                  reviewTimes[request.correctionRequestId]?.clockIn ??
+                  toDateTimeLocal(request.proposedClockInAt)
+                }
+                onChange={(event) =>
+                  setReviewTimes((current) => ({
+                    ...current,
+                    [request.correctionRequestId]: {
+                      ...current[request.correctionRequestId],
+                      clockIn: event.target.value,
+                    },
+                  }))
+                }
+              />
+
+              <label htmlFor={`approved-out-${request.correctionRequestId}`}>
+                Final clock-out
+              </label>
+              <input
+                id={`approved-out-${request.correctionRequestId}`}
+                type="datetime-local"
+                value={
+                  reviewTimes[request.correctionRequestId]?.clockOut ??
+                  toDateTimeLocal(request.proposedClockOutAt)
+                }
+                onChange={(event) =>
+                  setReviewTimes((current) => ({
+                    ...current,
+                    [request.correctionRequestId]: {
+                      ...current[request.correctionRequestId],
+                      clockOut: event.target.value,
+                    },
+                  }))
+                }
+              />
+            </div>
 
             <p>
               <strong>Reason:</strong> {request.reason}
@@ -133,7 +209,7 @@ function SupervisorCorrections() {
             <button
               disabled={busyId !== ""}
               onClick={() =>
-                reviewRequest(request.correctionRequestId, "approve")
+                reviewRequest(request, "approve")
               }
             >
               {busyId === request.correctionRequestId
@@ -144,7 +220,7 @@ function SupervisorCorrections() {
             <button
               disabled={busyId !== ""}
               onClick={() =>
-                reviewRequest(request.correctionRequestId, "reject")
+                reviewRequest(request, "reject")
               }
             >
               Reject

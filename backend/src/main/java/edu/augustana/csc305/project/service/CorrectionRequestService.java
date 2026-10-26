@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import edu.augustana.csc305.project.repository.UserRepository;
 import edu.augustana.csc305.project.dto.PendingCorrectionDto;
 import edu.augustana.csc305.project.model.User;
+import edu.augustana.csc305.project.dto.ReviewCorrectionRequest;
 
 import java.time.Duration;
 import java.util.List;
@@ -47,18 +48,22 @@ public class CorrectionRequestService {
                 .toList();
     }
 
-    public CorrectionRequestDto approve(String requestId, String reviewNote) {
-        return review(requestId, CorrectionStatus.APPROVED, reviewNote);
+        public CorrectionRequestDto approve(
+            String requestId,
+            ReviewCorrectionRequest reviewRequest) {
+        return review(requestId, CorrectionStatus.APPROVED, reviewRequest);
     }
 
-    public CorrectionRequestDto reject(String requestId, String reviewNote) {
-        return review(requestId, CorrectionStatus.REJECTED, reviewNote);
+    public CorrectionRequestDto reject(
+            String requestId,
+            ReviewCorrectionRequest reviewRequest) {
+        return review(requestId, CorrectionStatus.REJECTED, reviewRequest);
     }
 
     private CorrectionRequestDto review(
-        String requestId,
-        CorrectionStatus newStatus,
-        String reviewNote) {
+            String requestId,
+            CorrectionStatus newStatus,
+            ReviewCorrectionRequest reviewRequest) {
 
         ObjectId correctionRequestId =
                 parseObjectId(requestId, "correctionRequestId");
@@ -73,10 +78,26 @@ public class CorrectionRequestService {
                 .orElseThrow(() -> new IllegalStateException(
                         "Correction request refers to a missing time entry"));
 
+        String reviewNote =
+                reviewRequest == null ? null : reviewRequest.reviewNote();
+        
+        Instant approvedClockInAt = null;
+        Instant approvedClockOutAt = null;
         if (newStatus == CorrectionStatus.APPROVED) {
+            approvedClockInAt =
+                    reviewRequest == null ? null : reviewRequest.approvedClockInAt();
+            approvedClockOutAt =
+                    reviewRequest == null ? null : reviewRequest.approvedClockOutAt();
+
+            if (approvedClockInAt == null
+                    || approvedClockOutAt == null
+                    || !approvedClockOutAt.isAfter(approvedClockInAt)) {
+                throw new CorrectionException("INVALID_APPROVED_RANGE");
+            }
+
             long elapsedMinutes = Duration.between(
-                    request.getProposedClockInAt(),
-                    request.getProposedClockOutAt()
+                    approvedClockInAt,
+                    approvedClockOutAt
             ).toMinutes();
 
             int workedMinutes = (int) Math.max(
@@ -87,17 +108,22 @@ public class CorrectionRequestService {
                             request.getUserId(),
                             request.getOriginalClockInAt(),
                             request.getOriginalClockOutAt(),
-                            request.getProposedClockInAt(),
-                            request.getProposedClockOutAt(),
+                            approvedClockInAt,
+                            approvedClockOutAt,
                             workedMinutes)
                     .orElseThrow(() -> new CorrectionException(
                             "TIME_ENTRY_CHANGED"));
         }
 
         CorrectionRequest reviewedRequest = correctionRequestRepository
-                .updatePendingStatus(correctionRequestId, newStatus, reviewNote)
-                .orElseThrow(() -> new CorrectionException(
-                        "CORRECTION_NOT_PENDING"));
+        .updatePendingStatus(
+                correctionRequestId,
+                newStatus,
+                reviewNote,
+                approvedClockInAt,
+                approvedClockOutAt)
+        .orElseThrow(() -> new CorrectionException(
+                "CORRECTION_NOT_PENDING"));
 
         String jobTitle = employmentRepository.findById(entry.getEmploymentId())
                 .map(Employment::getJobId)
@@ -225,6 +251,8 @@ public class CorrectionRequestService {
                 request.getOriginalClockOutAt(),
                 request.getProposedClockInAt(),
                 request.getProposedClockOutAt(),
+                request.getApprovedClockInAt(),
+                request.getApprovedClockOutAt(),
                 request.getReason(),
                 request.getStatus(),
                 request.getReviewNote(),
