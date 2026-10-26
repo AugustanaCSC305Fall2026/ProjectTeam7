@@ -17,6 +17,8 @@ public class CorrectionRequest {
     private Instant originalClockOutAt;
     private Instant proposedClockInAt;
     private Instant proposedClockOutAt;
+    private Instant approvedClockInAt;
+    private Instant approvedClockOutAt;
     private String reason;
     private CorrectionStatus status;
     private String reviewNote;
@@ -45,6 +47,16 @@ public class CorrectionRequest {
 
     public Instant getProposedClockOutAt() { return proposedClockOutAt; }
     public void setProposedClockOutAt(Instant proposedClockOutAt) { this.proposedClockOutAt = proposedClockOutAt; }
+
+    public Instant getApprovedClockInAt() { return approvedClockInAt; }
+    public void setApprovedClockInAt(Instant approvedClockInAt) {
+        this.approvedClockInAt = approvedClockInAt;
+    }
+
+    public Instant getApprovedClockOutAt() { return approvedClockOutAt; }
+    public void setApprovedClockOutAt(Instant approvedClockOutAt) {
+        this.approvedClockOutAt = approvedClockOutAt;
+    }
 
     public String getReason() { return reason; }
     public void setReason(String reason) { this.reason = reason; }

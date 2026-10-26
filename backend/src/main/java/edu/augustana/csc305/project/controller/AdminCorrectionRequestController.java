@@ -32,20 +32,18 @@ public class AdminCorrectionRequestController {
         return correctionRequestService.getPendingCorrections();
     }
 
-    @PatchMapping("/{requestId}/approve")
-public CorrectionRequestDto approveCorrection(
-        @PathVariable String requestId,
-        @RequestBody(required = false) ReviewCorrectionRequest request) {
-            String reviewNote = request == null ? null : request.reviewNote();
-            return correctionRequestService.approve(requestId, reviewNote);
+        @PatchMapping("/{requestId}/approve")
+    public CorrectionRequestDto approveCorrection(
+            @PathVariable String requestId,
+            @RequestBody(required = false) ReviewCorrectionRequest request) {
+        return correctionRequestService.approve(requestId, request);
     }
 
     @PatchMapping("/{requestId}/reject")
     public CorrectionRequestDto rejectCorrection(
             @PathVariable String requestId,
             @RequestBody(required = false) ReviewCorrectionRequest request) {
-            String reviewNote = request == null ? null : request.reviewNote();
-            return correctionRequestService.reject(requestId, reviewNote);
+        return correctionRequestService.reject(requestId, request);
     }
 
     @ExceptionHandler(CorrectionRequestService.CorrectionException.class)
