@@ -31,6 +31,19 @@ public class EmploymentRepository {
         return results;
     }
 
+    public List<Employment> findActiveByJobId(ObjectId jobId) {
+        List<Employment> results = new ArrayList<>();
+
+        for (Employment employment : employments.find(
+                Filters.and(
+                        Filters.eq("jobId", jobId),
+                        Filters.eq("active", true)))) {
+            results.add(employment);
+        }
+
+        return results;
+    }
+
     public Optional<Employment> findById(ObjectId employmentId) {
         Employment employment = employments.find(Filters.eq("_id", employmentId)).first();
         return Optional.ofNullable(employment);

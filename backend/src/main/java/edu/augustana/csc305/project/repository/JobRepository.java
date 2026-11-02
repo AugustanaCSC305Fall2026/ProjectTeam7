@@ -37,6 +37,16 @@ public class JobRepository {
         return Optional.ofNullable(job);
     }
 
+    public List<Job> findByManagerId(ObjectId managerId) {
+        List<Job> results = new ArrayList<>();
+
+        for (Job job : jobs.find(Filters.eq("managerId", managerId))) {
+            results.add(job);
+        }
+
+        return results;
+    }
+
     public void storeJob(Job job) {
         jobs.insertOne(job);
     }

@@ -88,6 +88,13 @@ public class AdminEmploymentService {
             throw new AdminEmploymentException("USER_IS_NOT_MANAGER", 400);
         }
 
+        boolean assignedToAnotherJob = jobRepository.findByManagerId(manager.getId()).stream()
+        .anyMatch(assignedJob -> !assignedJob.getId().equals(job.getId()));
+
+        if (assignedToAnotherJob) {
+            throw new AdminEmploymentException("MANAGER_ALREADY_ASSIGNED", 409);
+        }
+
         jobRepository.assignManager(job.getId(), manager.getId());
         job.setManagerId(manager.getId());
 
