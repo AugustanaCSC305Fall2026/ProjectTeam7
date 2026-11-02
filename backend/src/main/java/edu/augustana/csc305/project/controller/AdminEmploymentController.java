@@ -3,6 +3,7 @@ package edu.augustana.csc305.project.controller;
 import edu.augustana.csc305.project.dto.AdminJobDto;
 import edu.augustana.csc305.project.dto.AdminUserDto;
 import edu.augustana.csc305.project.dto.AssignEmploymentRequest;
+import edu.augustana.csc305.project.dto.AssignManagerRequest;
 import edu.augustana.csc305.project.dto.CreateJobRequest;
 import edu.augustana.csc305.project.dto.EmploymentAssignmentDto;
 import edu.augustana.csc305.project.service.AdminEmploymentService;
@@ -41,6 +42,12 @@ public class AdminEmploymentController {
             @RequestBody CreateJobRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(adminEmploymentService.createJob(request));
+    }
+
+    @PostMapping("/jobs/manager")
+    public ResponseEntity<AdminJobDto> assignManager(
+            @RequestBody AssignManagerRequest request) {
+        return ResponseEntity.ok(adminEmploymentService.assignManager(request));
     }
 
     @PostMapping("/employments")

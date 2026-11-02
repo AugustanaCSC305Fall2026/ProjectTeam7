@@ -4,6 +4,7 @@ public record AdminJobDto(
         String id,
         String title,
         String department,
-        String description
+        String description,
+        String managerId
 ) {
 }
