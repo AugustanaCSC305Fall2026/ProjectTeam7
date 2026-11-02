@@ -12,7 +12,7 @@ public class Job {
     private String title;
     private String department;
     private String description;
-
+    private ObjectId managerId;
     public Job() {
     }
 
@@ -54,4 +54,8 @@ public class Job {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public ObjectId getManagerId() {return managerId;}
+
+    public void setManagerId(ObjectId managerId) {this.managerId = managerId;}
 }

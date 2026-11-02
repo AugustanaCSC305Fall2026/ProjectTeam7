@@ -3,6 +3,7 @@ package edu.augustana.csc305.project.service;
 import edu.augustana.csc305.project.dto.AdminJobDto;
 import edu.augustana.csc305.project.dto.AdminUserDto;
 import edu.augustana.csc305.project.dto.AssignEmploymentRequest;
+import edu.augustana.csc305.project.dto.AssignManagerRequest;
 import edu.augustana.csc305.project.dto.CreateJobRequest;
 import edu.augustana.csc305.project.dto.EmploymentAssignmentDto;
 import edu.augustana.csc305.project.model.Employment;
@@ -48,7 +49,10 @@ public class AdminEmploymentService {
                         job.getId().toHexString(),
                         job.getTitle(),
                         job.getDepartment(),
-                        job.getDescription()))
+                        job.getDescription(),
+                        job.getManagerId() == null
+                                ? null
+                                : job.getManagerId().toHexString()))
                 .toList();
     }
     public AdminJobDto createJob(CreateJobRequest request) {
@@ -65,8 +69,34 @@ public class AdminEmploymentService {
                 job.getId().toHexString(),
                 job.getTitle(),
                 job.getDepartment(),
-                job.getDescription()
+                job.getDescription(),
+                null
         );
+    }
+
+    public AdminJobDto assignManager(AssignManagerRequest request) {
+        ObjectId jobId = parseId(request.jobId(), "jobId");
+        ObjectId managerId = parseId(request.managerId(), "managerId");
+
+        Job job = jobRepository.findById(jobId)
+                .orElseThrow(() -> new AdminEmploymentException("JOB_NOT_FOUND", 404));
+
+        User manager = userRepository.findById(managerId)
+                .orElseThrow(() -> new AdminEmploymentException("MANAGER_NOT_FOUND", 404));
+
+        if (!manager.getRoles().contains("MANAGER")) {
+            throw new AdminEmploymentException("USER_IS_NOT_MANAGER", 400);
+        }
+
+        jobRepository.assignManager(job.getId(), manager.getId());
+        job.setManagerId(manager.getId());
+
+        return new AdminJobDto(
+                job.getId().toHexString(),
+                job.getTitle(),
+                job.getDepartment(),
+                job.getDescription(),
+                job.getManagerId().toHexString());
     }
 
     public EmploymentAssignmentDto assign(AssignEmploymentRequest request) {
