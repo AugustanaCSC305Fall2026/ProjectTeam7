@@ -5,6 +5,7 @@ import edu.augustana.csc305.project.dto.AdminUserDto;
 import edu.augustana.csc305.project.dto.AssignEmploymentRequest;
 import edu.augustana.csc305.project.dto.AssignManagerRequest;
 import edu.augustana.csc305.project.dto.CreateJobRequest;
+import edu.augustana.csc305.project.dto.CreateManagerRequest;
 import edu.augustana.csc305.project.dto.EmploymentAssignmentDto;
 import edu.augustana.csc305.project.model.Employment;
 import edu.augustana.csc305.project.model.Job;
@@ -14,6 +15,7 @@ import edu.augustana.csc305.project.repository.JobRepository;
 import edu.augustana.csc305.project.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Date;
 import java.util.List;
@@ -23,13 +25,16 @@ public class AdminEmploymentService {
     private final UserRepository userRepository;
     private final JobRepository jobRepository;
     private final EmploymentRepository employmentRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public AdminEmploymentService(UserRepository userRepository,
                                   JobRepository jobRepository,
-                                  EmploymentRepository employmentRepository) {
+                                  EmploymentRepository employmentRepository,
+                                  PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.jobRepository = jobRepository;
         this.employmentRepository = employmentRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<AdminUserDto> getUsers() {
@@ -72,6 +77,38 @@ public class AdminEmploymentService {
                 job.getDescription(),
                 null
         );
+    }
+
+    public AdminUserDto createManager(CreateManagerRequest request) {
+        String firstName = clean(request.firstName());
+        String lastName = clean(request.lastName());
+        String email = clean(request.email()).toLowerCase();
+
+        if (firstName.isBlank() || lastName.isBlank()
+                || !email.contains("@") || request.password() == null
+                || request.password().length() < 8) {
+            throw new AdminEmploymentException("INVALID_MANAGER_DATA", 400);
+        }
+
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new AdminEmploymentException("EMAIL_ALREADY_REGISTERED", 409);
+        }
+
+        User manager = new User(
+                null,
+                firstName,
+                lastName,
+                email,
+                passwordEncoder.encode(request.password()),
+                List.of("MANAGER"));
+        userRepository.storeUser(manager);
+
+        return new AdminUserDto(
+                manager.getId().toHexString(),
+                manager.getFirstName(),
+                manager.getLastName(),
+                manager.getEmail(),
+                manager.getRoles());
     }
 
     public AdminJobDto assignManager(AssignManagerRequest request) {
@@ -161,6 +198,10 @@ public class AdminEmploymentService {
         String[] parts = user.getName() == null ? new String[0]
                 : user.getName().trim().split("\\s+", 2);
         return parts.length > index ? parts[index] : "";
+    }
+
+    private String clean(String value) {
+        return value == null ? "" : value.trim();
     }
 
     public static class AdminEmploymentException extends RuntimeException {

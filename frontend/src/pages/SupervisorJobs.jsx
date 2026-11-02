@@ -9,7 +9,14 @@ function SupervisorJobs() {
     jobId: "",
     managerId: "",
   });
+  const [createManagerForm, setCreateManagerForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+  });
   const [assigning, setAssigning] = useState(false);
+  const [creatingManager, setCreatingManager] = useState(false);
   const [form, setForm] = useState({
     title: "",
     department: "",
@@ -101,6 +108,44 @@ function SupervisorJobs() {
     [event.target.name]: event.target.value,
   }));
 };
+
+  const handleCreateManagerChange = (event) => {
+    setCreateManagerForm((current) => ({
+      ...current,
+      [event.target.name]: event.target.value,
+    }));
+  };
+
+  const handleCreateManager = async (event) => {
+    event.preventDefault();
+    setMessage("");
+    setError("");
+    setCreatingManager(true);
+
+    try {
+      const response = await api.post("/admin/managers", createManagerForm);
+      setManagers((current) => [...current, response.data]);
+      setCreateManagerForm({ firstName: "", lastName: "", email: "", password: "" });
+      setMessage(`${response.data.firstName} ${response.data.lastName} was created as a manager.`);
+    } catch (err) {
+      const status = err.response?.status;
+      const code = err.response?.data?.code;
+
+      if (status === 409 || code === "EMAIL_ALREADY_REGISTERED") {
+        setError("That email address is already registered.");
+      } else if (status === 400) {
+        setError("Enter a first name, last name, valid email, and password of at least 8 characters.");
+      } else if (status === 401) {
+        setError("Your session has expired. Please log in again.");
+      } else if (status === 403) {
+        setError("Your account is not authorized to create managers.");
+      } else {
+        setError("Unable to create the manager account. Please try again.");
+      }
+    } finally {
+      setCreatingManager(false);
+    }
+  };
 
   const handleManagerAssignment = async (event) => {
     event.preventDefault();
@@ -238,6 +283,34 @@ function SupervisorJobs() {
 
       <button type="submit" disabled={assigning}>
         {assigning ? "Assigning..." : "Assign Manager"}
+      </button>
+    </form>
+
+    <h3>Create Manager Account</h3>
+
+    <form className="job-form" onSubmit={handleCreateManager}>
+      <label>
+        First name
+        <input name="firstName" value={createManagerForm.firstName}
+          onChange={handleCreateManagerChange} required />
+      </label>
+      <label>
+        Last name
+        <input name="lastName" value={createManagerForm.lastName}
+          onChange={handleCreateManagerChange} required />
+      </label>
+      <label>
+        Email
+        <input type="email" name="email" value={createManagerForm.email}
+          onChange={handleCreateManagerChange} required />
+      </label>
+      <label>
+        Temporary password
+        <input type="password" name="password" minLength="8"
+          value={createManagerForm.password} onChange={handleCreateManagerChange} required />
+      </label>
+      <button type="submit" disabled={creatingManager}>
+        {creatingManager ? "Creating..." : "Create manager"}
       </button>
     </form>
 
