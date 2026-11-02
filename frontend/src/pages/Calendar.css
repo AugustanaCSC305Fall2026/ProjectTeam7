@@ -95,6 +95,38 @@
     color: #a64242;
 }
 
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border-bottom: 1px solid #e3e7e4;
+}
+
+.calendar-weekdays div {
+    padding: 10px;
+    color: #7b8581;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-day {
+    min-height: 100px;
+    padding: 10px;
+    border-right: 1px solid #edf0ee;
+    border-bottom: 1px solid #edf0ee;
+}
+
+.calendar-day-number {
+    color: #26322f;
+    font-size: 13px;
+    font-weight: 700;
+}
+
 @media (max-width: 800px) {
     .calendar-shift {
         grid-template-columns: 1fr;

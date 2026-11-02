@@ -24,20 +24,35 @@ function Calendar() {
         }
     };
 
-    const formatDate = (date) => {
-        return new Date(date).toLocaleDateString([], {
-            weekday: "short",
-            month: "short",
-            day: "numeric"
-        });
-    };
-
     const formatTime = (date) => {
         return new Date(date).toLocaleTimeString([], {
             hour: "numeric",
             minute: "2-digit"
         });
     };
+
+    const today = new Date();
+
+    const year = today.getFullYear();
+    const month = today.getMonth();
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    const calendarDays = [];
+
+    for (let i = 0; i < firstDay; i++) {
+        calendarDays.push(null);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        calendarDays.push(day);
+    }
+
+    const monthName = today.toLocaleDateString([], {
+        month: "long",
+        year: "numeric"
+    });
 
     return (
         <StudentLayout
@@ -54,10 +69,10 @@ function Calendar() {
                 <div className="calendar-heading">
                     <div>
                         <span className="calendar-label">
-                            UPCOMING SCHEDULE
+                            WORK SCHEDULE
                         </span>
 
-                        <h2>Your Shifts</h2>
+                        <h2>{monthName}</h2>
                     </div>
 
                     <span className="calendar-count">
@@ -66,42 +81,27 @@ function Calendar() {
                     </span>
                 </div>
 
-                {shifts.length === 0 && !error ? (
-                    <div className="calendar-empty">
-                        No upcoming shifts scheduled.
-                    </div>
-                ) : (
-                    <div className="calendar-shift-list">
-                        {shifts.map((shift) => (
-                            <div
-                                className="calendar-shift"
-                                key={shift.id}
-                            >
-                                <div className="calendar-date">
-                                    <strong>
-                                        {formatDate(shift.startAt)}
-                                    </strong>
-                                </div>
+                <div className="calendar-weekdays">
+                    <div>Sun</div>
+                    <div>Mon</div>
+                    <div>Tue</div>
+                    <div>Wed</div>
+                    <div>Thu</div>
+                    <div>Fri</div>
+                    <div>Sat</div>
+                </div>
 
-                                <div className="calendar-shift-info">
-                                    <strong>
-                                        {shift.jobTitle || "Scheduled Shift"}
-                                    </strong>
-
-                                    <span>
-                                        {formatTime(shift.startAt)}
-                                        {" – "}
-                                        {formatTime(shift.endAt)}
-                                    </span>
-                                </div>
-
-                                <span className="calendar-status">
-                                    Scheduled
+                <div className="calendar-grid">
+                    {calendarDays.map((day, index) => (
+                        <div className="calendar-day" key={index}>
+                            {day && (
+                                <span className="calendar-day-number">
+                                    {day}
                                 </span>
-                            </div>
-                        ))}
-                    </div>
-                )}
+                            )}
+                        </div>
+                    ))}
+                </div>
             </section>
         </StudentLayout>
     );
