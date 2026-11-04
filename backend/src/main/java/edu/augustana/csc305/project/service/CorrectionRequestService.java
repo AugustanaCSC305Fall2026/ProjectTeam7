@@ -18,7 +18,6 @@ import edu.augustana.csc305.project.dto.PendingCorrectionDto;
 import edu.augustana.csc305.project.model.User;
 import edu.augustana.csc305.project.dto.ReviewCorrectionRequest;
 
-import java.time.Duration;
 import java.util.List;
 import java.time.Instant;
 
@@ -95,13 +94,11 @@ public class CorrectionRequestService {
                 throw new CorrectionException("INVALID_APPROVED_RANGE");
             }
 
-            long elapsedMinutes = Duration.between(
-                    approvedClockInAt,
-                    approvedClockOutAt
-            ).toMinutes();
+            int workedMinutes = WorkedMinutesCalculator.calculate(
+                approvedClockInAt,
+                approvedClockOutAt,
+                entry.getBreakMinutes());
 
-            int workedMinutes = (int) Math.max(
-                    0, elapsedMinutes - entry.getBreakMinutes());
 
             entry = timeEntryRepository.applyCorrection(
                             request.getTimeEntryId(),
