@@ -15,6 +15,7 @@ import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.ReturnDocument;
 import com.mongodb.client.model.Updates;
 
+import java.time.Instant;
 import java.util.Optional;
 
 @Repository
@@ -62,7 +63,9 @@ public class CorrectionRequestRepository {
     public Optional<CorrectionRequest> updatePendingStatus(
         ObjectId correctionRequestId,
         CorrectionStatus newStatus,
-        String reviewNote) {
+        String reviewNote,
+        Instant approvedClockInAt,
+        Instant approvedClockOutAt) {
 
         CorrectionRequest updated = requests.findOneAndUpdate(
                 Filters.and(
@@ -71,7 +74,9 @@ public class CorrectionRequestRepository {
                 ),
                 Updates.combine(
                         Updates.set("status", newStatus),
-                        Updates.set("reviewNote", reviewNote)
+                        Updates.set("reviewNote", reviewNote),
+                        Updates.set("approvedClockInAt", approvedClockInAt),
+                        Updates.set("approvedClockOutAt", approvedClockOutAt)
                 ),
                 new FindOneAndUpdateOptions()
                         .returnDocument(ReturnDocument.AFTER)

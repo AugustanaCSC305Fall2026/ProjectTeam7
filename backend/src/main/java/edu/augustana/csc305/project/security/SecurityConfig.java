@@ -55,6 +55,7 @@ import java.util.List;
                         .requestMatchers(HttpMethod.GET, "/api/v1/availability").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/admin/corrections/pending").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/admin/corrections/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/manager/**").hasRole("MANAGER")
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated() // All other requests need a token
                 )

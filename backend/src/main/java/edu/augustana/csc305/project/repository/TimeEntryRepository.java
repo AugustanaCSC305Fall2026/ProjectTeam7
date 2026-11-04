@@ -36,6 +36,14 @@ public class TimeEntryRepository {
         return Optional.ofNullable(entry);
     }
 
+    public Optional<TimeEntry> findById(ObjectId timeEntryId) {
+        TimeEntry entry = timeEntries.find(
+                Filters.eq("_id", timeEntryId)
+        ).first();
+
+        return Optional.ofNullable(entry);
+        }
+
     public List<TimeEntry> findByUserId(ObjectId userId) {
         List<TimeEntry> results = new ArrayList<>();
 
@@ -60,6 +68,22 @@ public class TimeEntryRepository {
     public void storeTimeEntry(TimeEntry entry) {
         timeEntries.insertOne(entry);
     }
+
+    public List<TimeEntry> findByEmploymentIds(List<ObjectId> employmentIds) {
+        if (employmentIds == null || employmentIds.isEmpty()) {
+                return List.of();
+        }
+
+        List<TimeEntry> results = new ArrayList<>();
+
+        for (TimeEntry entry : timeEntries
+                .find(Filters.in("employmentId", employmentIds))
+                .sort(Sorts.descending("clockInAt"))) {
+                results.add(entry);
+        }
+
+        return results;
+        }
 
     public Optional<TimeEntry> clockOutOpenEntry(
             ObjectId timeEntryId,

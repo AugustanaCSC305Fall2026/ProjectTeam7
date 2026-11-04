@@ -30,61 +30,6 @@
     font-size: 13px;
 }
 
-.calendar-shift-list {
-    display: flex;
-    flex-direction: column;
-}
-
-.calendar-shift {
-    display: grid;
-    grid-template-columns: 160px 1fr auto;
-    gap: 24px;
-    align-items: center;
-    padding: 18px 14px;
-    border-bottom: 1px solid #edf0ee;
-}
-
-.calendar-shift:last-child {
-    border-bottom: none;
-}
-
-.calendar-date strong {
-    color: #26322f;
-    font-size: 14px;
-}
-
-.calendar-shift-info {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.calendar-shift-info strong {
-    color: #26322f;
-    font-size: 14px;
-}
-
-.calendar-shift-info span {
-    color: #7b8581;
-    font-size: 13px;
-}
-
-.calendar-status {
-    padding: 5px 10px;
-    border-radius: 14px;
-    background: #e6f3ed;
-    color: #17805c;
-    font-size: 11px;
-    font-weight: 700;
-}
-
-.calendar-empty {
-    padding: 45px 20px;
-    border: 1px dashed #ccd4d0;
-    border-radius: 7px;
-    color: #7b8581;
-    text-align: center;
-}
 
 .calendar-error {
     margin: 0 0 20px;
@@ -95,13 +40,76 @@
     color: #a64242;
 }
 
-@media (max-width: 800px) {
-    .calendar-shift {
-        grid-template-columns: 1fr;
-        gap: 8px;
-    }
-
-    .calendar-status {
-        width: fit-content;
-    }
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border-bottom: 1px solid #e3e7e4;
 }
+
+.calendar-weekdays div {
+    padding: 10px;
+    color: #7b8581;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-day {
+    min-height: 100px;
+    padding: 10px;
+    border-right: 1px solid #edf0ee;
+    border-bottom: 1px solid #edf0ee;
+}
+
+.calendar-day-number {
+    color: #26322f;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.calendar-shift-event {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 8px;
+    padding: 8px;
+    border-radius: 6px;
+    background: #e6f3ed;
+    color: #17805c;
+    font-size: 12px;
+}
+
+.calendar-shift-event strong {
+    font-size: 12px;
+}
+
+.calendar-shift-event span {
+    font-size: 11px;
+    line-height: 1.5;
+    white-space: nowrap;
+}
+
+.calendar-navigation {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.calendar-navigation button {
+    padding: 7px 12px;
+    border: 1px solid #e3e7e4;
+    border-radius: 6px;
+    background: white;
+    color: #26322f;
+    cursor: pointer;
+}
+
+.calendar-navigation button:hover {
+    background: #e6f3ed;
+}
+
