@@ -9,6 +9,7 @@ import edu.augustana.csc305.project.dto.ManagerEmployeeHoursDto;
 import edu.augustana.csc305.project.dto.ManagerTimeEntryEditRequest;
 import edu.augustana.csc305.project.dto.TimeEntryDto;
 import edu.augustana.csc305.project.dto.ShiftDto;
+import edu.augustana.csc305.project.dto.ManagerCreateShiftRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -96,5 +97,14 @@ public class ManagerController {
             Instant to) {
         ObjectId managerId = new ObjectId(authenticatedUser.id());
         return managerService.getEmployeeShifts(managerId, from, to);
+    }
+
+    @PostMapping("/shifts")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ShiftDto createEmployeeShift(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @RequestBody ManagerCreateShiftRequest request) {
+        ObjectId managerId = new ObjectId(authenticatedUser.id());
+        return managerService.createEmployeeShift(managerId, request);
     }
 }
