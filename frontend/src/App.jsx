@@ -17,6 +17,11 @@ import SupervisorAvailability from "./pages/SupervisorAvailability";
 import SupervisorAssignments from "./pages/SupervisorAssignments";
 import SupervisorJobs from "./pages/SupervisorJobs";
 import Availability from "./pages/Availability";
+import ManagerLayout from "./components/ManagerLayout";
+import ManagerDashboard from "./pages/ManagerDashboard";
+import ManagerEmployees from "./pages/ManagerEmployees";
+import ManagerHours from "./pages/ManagerHours";
+import ManagerShifts from "./pages/ManagerShifts";
 
 /*
  * We use the react-router-dom library to load pages based
@@ -74,6 +79,29 @@ const router = createBrowserRouter([
         <Availability />
       </ProtectedRoute>
     ),
+  },
+  {
+  path: "/manager",
+    element: (
+      <RoleProtectedRoute requiredRole="MANAGER">
+        <ManagerLayout />
+      </RoleProtectedRoute>
+    ),
+    children: [
+      { index: true, element: <ManagerDashboard /> },
+      {
+        path: "employees",
+        element: <ManagerEmployees />,
+      },
+      {
+        path: "hours",
+        element: <ManagerHours />,
+      },
+      {
+        path: "shifts",
+        element: <ManagerShifts />,
+      },
+    ],
   },
   {
   path: "/supervisor",

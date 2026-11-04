@@ -1,0 +1,91 @@
+.manager-employees h2,
+.manager-employee-list h3 {
+  color: #194278;
+}
+
+.manager-employees__intro {
+  color: #7b8581;
+}
+
+.manager-employee-form,
+.manager-employee-card {
+  display: flex;
+  gap: 16px;
+  align-items: end;
+  padding: 20px;
+  border: 1px solid #e3e7e4;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.manager-employee-form {
+  flex-wrap: wrap;
+}
+
+.manager-employee-form label {
+  display: flex;
+  flex: 1;
+  min-width: 220px;
+  flex-direction: column;
+  gap: 6px;
+  color: #56615d;
+}
+
+.manager-employee-form input {
+  padding: 10px 12px;
+  border: 1px solid #d8dedb;
+  border-radius: 6px;
+  font: inherit;
+}
+
+.manager-employee-form button,
+.manager-employee-card button {
+  padding: 10px 14px;
+  border: 1px solid #17805c;
+  border-radius: 6px;
+  background: #17805c;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.manager-employee-form button:disabled,
+.manager-employee-card button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.manager-employee-list {
+  margin-top: 28px;
+}
+
+.manager-employee-card {
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.manager-employee-card h4,
+.manager-employee-card p {
+  margin: 4px 0;
+}
+
+.manager-employee-card p {
+  color: #7b8581;
+}
+
+.manager-employees__message {
+  color: #187957;
+}
+
+.manager-employees__error {
+  color: #a64242;
+}
+
+@media (max-width: 640px) {
+  .manager-employee-form,
+  .manager-employee-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

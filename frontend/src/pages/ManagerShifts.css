@@ -1,0 +1,82 @@
+.manager-shifts h2,
+.manager-shift-card h3 {
+  color: #194278;
+}
+
+.manager-shifts__intro,
+.manager-shift-card p {
+  color: #7b8581;
+}
+
+.manager-shifts__filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 14px;
+  margin: 20px 0;
+  padding: 18px;
+  border: 1px solid #e3e7e4;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.manager-shifts__filters label {
+  display: flex;
+  min-width: 180px;
+  flex-direction: column;
+  gap: 6px;
+  color: #56615d;
+}
+
+.manager-shifts__filters input {
+  padding: 9px 10px;
+  border: 1px solid #d8dedb;
+  border-radius: 6px;
+  font: inherit;
+}
+
+.manager-shifts__filters button {
+  padding: 10px 14px;
+  border: 1px solid #17805c;
+  border-radius: 6px;
+  background: #17805c;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.manager-shifts__filters button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.manager-shift-card {
+  margin-top: 14px;
+  padding: 18px;
+  border: 1px solid #e3e7e4;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.manager-shift-card h3,
+.manager-shift-card p {
+  margin: 5px 0;
+}
+
+.manager-shift-card h3 {
+  color: #194278;
+}
+
+.manager-shifts__error {
+  color: #a64242;
+}
+
+.manager-shifts__empty {
+  color: #7b8581;
+}
+
+@media (max-width: 640px) {
+  .manager-shift-card {
+    overflow-wrap: anywhere;
+  }
+}
