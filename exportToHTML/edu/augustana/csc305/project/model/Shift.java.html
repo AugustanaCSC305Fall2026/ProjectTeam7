@@ -1,0 +1,161 @@
+<html>
+<head>
+<title>Shift.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #6aab73;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+Shift.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">edu</span><span class="s2">.</span><span class="s1">augustana</span><span class="s2">.</span><span class="s1">csc305</span><span class="s2">.</span><span class="s1">project</span><span class="s2">.</span><span class="s1">model</span><span class="s2">;</span>
+
+<span class="s0">import </span><span class="s1">org</span><span class="s2">.</span><span class="s1">bson</span><span class="s2">.</span><span class="s1">types</span><span class="s2">.</span><span class="s1">ObjectId</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">org</span><span class="s2">.</span><span class="s1">springframework</span><span class="s2">.</span><span class="s1">data</span><span class="s2">.</span><span class="s1">annotation</span><span class="s2">.</span><span class="s1">Id</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">org</span><span class="s2">.</span><span class="s1">springframework</span><span class="s2">.</span><span class="s1">data</span><span class="s2">.</span><span class="s1">mongodb</span><span class="s2">.</span><span class="s1">core</span><span class="s2">.</span><span class="s1">mapping</span><span class="s2">.</span><span class="s1">Document</span><span class="s2">;</span>
+
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">time</span><span class="s2">.</span><span class="s1">Duration</span><span class="s2">;</span>
+<span class="s0">import </span><span class="s1">java</span><span class="s2">.</span><span class="s1">time</span><span class="s2">.</span><span class="s1">Instant</span><span class="s2">;</span>
+
+<span class="s1">@Document</span><span class="s2">(</span><span class="s1">collection </span><span class="s2">= </span><span class="s3">&quot;shifts&quot;</span><span class="s2">)</span>
+<span class="s0">public class </span><span class="s1">Shift </span><span class="s2">{</span>
+
+    <span class="s1">@Id</span>
+    <span class="s0">private </span><span class="s1">ObjectId id</span><span class="s2">;</span>
+
+    <span class="s0">private </span><span class="s1">ObjectId employmentId</span><span class="s2">;</span>
+    <span class="s0">private </span><span class="s1">ObjectId jobId</span><span class="s2">;</span>
+    <span class="s0">private </span><span class="s1">Instant startAt</span><span class="s2">;</span>
+    <span class="s0">private </span><span class="s1">Instant endAt</span><span class="s2">;</span>
+    <span class="s0">private </span><span class="s1">ShiftStatus status</span><span class="s2">;</span>
+    <span class="s0">private </span><span class="s1">String note</span><span class="s2">;</span>
+    <span class="s0">private </span><span class="s1">ShiftOffer offer</span><span class="s2">;</span>
+    <span class="s0">private </span><span class="s1">ObjectId createdByUserId</span><span class="s2">;</span>
+
+    <span class="s0">public </span><span class="s1">Shift</span><span class="s2">() {</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public </span><span class="s1">Shift</span><span class="s2">(</span>
+            <span class="s1">ObjectId id</span><span class="s2">,</span>
+            <span class="s1">ObjectId employmentId</span><span class="s2">,</span>
+            <span class="s1">ObjectId jobId</span><span class="s2">,</span>
+            <span class="s1">Instant startAt</span><span class="s2">,</span>
+            <span class="s1">Instant endAt</span><span class="s2">,</span>
+            <span class="s1">ShiftStatus status</span><span class="s2">,</span>
+            <span class="s1">String note</span><span class="s2">) {</span>
+
+        <span class="s0">this</span><span class="s2">(</span><span class="s1">id</span><span class="s2">, </span><span class="s1">employmentId</span><span class="s2">, </span><span class="s1">jobId</span><span class="s2">, </span><span class="s1">startAt</span><span class="s2">, </span><span class="s1">endAt</span><span class="s2">,</span>
+                <span class="s1">status</span><span class="s2">, </span><span class="s1">note</span><span class="s2">, </span><span class="s0">null</span><span class="s2">, </span><span class="s0">null</span><span class="s2">);</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public </span><span class="s1">Shift</span><span class="s2">(</span>
+            <span class="s1">ObjectId id</span><span class="s2">,</span>
+            <span class="s1">ObjectId employmentId</span><span class="s2">,</span>
+            <span class="s1">ObjectId jobId</span><span class="s2">,</span>
+            <span class="s1">Instant startAt</span><span class="s2">,</span>
+            <span class="s1">Instant endAt</span><span class="s2">,</span>
+            <span class="s1">ShiftStatus status</span><span class="s2">,</span>
+            <span class="s1">String note</span><span class="s2">,</span>
+            <span class="s1">ShiftOffer offer</span><span class="s2">,</span>
+            <span class="s1">ObjectId createdByUserId</span><span class="s2">) {</span>
+
+        <span class="s0">this</span><span class="s2">.</span><span class="s1">id </span><span class="s2">= </span><span class="s1">id</span><span class="s2">;</span>
+        <span class="s0">this</span><span class="s2">.</span><span class="s1">employmentId </span><span class="s2">= </span><span class="s1">employmentId</span><span class="s2">;</span>
+        <span class="s0">this</span><span class="s2">.</span><span class="s1">jobId </span><span class="s2">= </span><span class="s1">jobId</span><span class="s2">;</span>
+        <span class="s0">this</span><span class="s2">.</span><span class="s1">startAt </span><span class="s2">= </span><span class="s1">startAt</span><span class="s2">;</span>
+        <span class="s0">this</span><span class="s2">.</span><span class="s1">endAt </span><span class="s2">= </span><span class="s1">endAt</span><span class="s2">;</span>
+        <span class="s0">this</span><span class="s2">.</span><span class="s1">status </span><span class="s2">= </span><span class="s1">status</span><span class="s2">;</span>
+        <span class="s0">this</span><span class="s2">.</span><span class="s1">note </span><span class="s2">= </span><span class="s1">note</span><span class="s2">;</span>
+        <span class="s0">this</span><span class="s2">.</span><span class="s1">offer </span><span class="s2">= </span><span class="s1">offer</span><span class="s2">;</span>
+        <span class="s0">this</span><span class="s2">.</span><span class="s1">createdByUserId </span><span class="s2">= </span><span class="s1">createdByUserId</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public </span><span class="s1">ObjectId getId</span><span class="s2">() {</span>
+        <span class="s0">return </span><span class="s1">id</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public void </span><span class="s1">setId</span><span class="s2">(</span><span class="s1">ObjectId id</span><span class="s2">) {</span>
+        <span class="s0">this</span><span class="s2">.</span><span class="s1">id </span><span class="s2">= </span><span class="s1">id</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public </span><span class="s1">ObjectId getEmploymentId</span><span class="s2">() {</span>
+        <span class="s0">return </span><span class="s1">employmentId</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public void </span><span class="s1">setEmploymentId</span><span class="s2">(</span><span class="s1">ObjectId employmentId</span><span class="s2">) {</span>
+        <span class="s0">this</span><span class="s2">.</span><span class="s1">employmentId </span><span class="s2">= </span><span class="s1">employmentId</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public </span><span class="s1">ObjectId getJobId</span><span class="s2">() {</span>
+        <span class="s0">return </span><span class="s1">jobId</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public void </span><span class="s1">setJobId</span><span class="s2">(</span><span class="s1">ObjectId jobId</span><span class="s2">) {</span>
+        <span class="s0">this</span><span class="s2">.</span><span class="s1">jobId </span><span class="s2">= </span><span class="s1">jobId</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public </span><span class="s1">Instant getStartAt</span><span class="s2">() {</span>
+        <span class="s0">return </span><span class="s1">startAt</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public void </span><span class="s1">setStartAt</span><span class="s2">(</span><span class="s1">Instant startAt</span><span class="s2">) {</span>
+        <span class="s0">this</span><span class="s2">.</span><span class="s1">startAt </span><span class="s2">= </span><span class="s1">startAt</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public </span><span class="s1">Instant getEndAt</span><span class="s2">() {</span>
+        <span class="s0">return </span><span class="s1">endAt</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public void </span><span class="s1">setEndAt</span><span class="s2">(</span><span class="s1">Instant endAt</span><span class="s2">) {</span>
+        <span class="s0">this</span><span class="s2">.</span><span class="s1">endAt </span><span class="s2">= </span><span class="s1">endAt</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public </span><span class="s1">ShiftStatus getStatus</span><span class="s2">() {</span>
+        <span class="s0">return </span><span class="s1">status</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public void </span><span class="s1">setStatus</span><span class="s2">(</span><span class="s1">ShiftStatus status</span><span class="s2">) {</span>
+        <span class="s0">this</span><span class="s2">.</span><span class="s1">status </span><span class="s2">= </span><span class="s1">status</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public </span><span class="s1">String getNote</span><span class="s2">() {</span>
+        <span class="s0">return </span><span class="s1">note</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public void </span><span class="s1">setNote</span><span class="s2">(</span><span class="s1">String note</span><span class="s2">) {</span>
+        <span class="s0">this</span><span class="s2">.</span><span class="s1">note </span><span class="s2">= </span><span class="s1">note</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public </span><span class="s1">ShiftOffer getOffer</span><span class="s2">() {</span>
+        <span class="s0">return </span><span class="s1">offer</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public void </span><span class="s1">setOffer</span><span class="s2">(</span><span class="s1">ShiftOffer offer</span><span class="s2">) {</span>
+        <span class="s0">this</span><span class="s2">.</span><span class="s1">offer </span><span class="s2">= </span><span class="s1">offer</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public </span><span class="s1">ObjectId getCreatedByUserId</span><span class="s2">() {</span>
+        <span class="s0">return </span><span class="s1">createdByUserId</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public void </span><span class="s1">setCreatedByUserId</span><span class="s2">(</span><span class="s1">ObjectId createdByUserId</span><span class="s2">) {</span>
+        <span class="s0">this</span><span class="s2">.</span><span class="s1">createdByUserId </span><span class="s2">= </span><span class="s1">createdByUserId</span><span class="s2">;</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public int </span><span class="s1">durationMinutes</span><span class="s2">() {</span>
+        <span class="s0">return </span><span class="s2">(</span><span class="s0">int</span><span class="s2">) </span><span class="s1">Duration</span><span class="s2">.</span><span class="s1">between</span><span class="s2">(</span><span class="s1">startAt</span><span class="s2">, </span><span class="s1">endAt</span><span class="s2">).</span><span class="s1">toMinutes</span><span class="s2">();</span>
+    <span class="s2">}</span>
+
+    <span class="s0">public boolean </span><span class="s1">hasStarted</span><span class="s2">() {</span>
+        <span class="s0">return </span><span class="s2">!</span><span class="s1">Instant</span><span class="s2">.</span><span class="s1">now</span><span class="s2">().</span><span class="s1">isBefore</span><span class="s2">(</span><span class="s1">startAt</span><span class="s2">);</span>
+    <span class="s2">}</span>
+<span class="s2">}</span></pre>
+</body>
+</html>
