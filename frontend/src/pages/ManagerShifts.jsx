@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../api/backendApi";
 import "./ManagerShifts.css";
 
@@ -25,9 +25,100 @@ function ManagerShifts() {
   const [to, setTo] = useState(localDateValue(weekEnd));
   const [shifts, setShifts] = useState([]);
   const [employees, setEmployees] = useState([]);
+  const [job, setJob] = useState(null);
+  const [setupLoading, setSetupLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [error, setError] = useState("");
+  const [shiftDate, setShiftDate] = useState(localDateValue(today));
+const [shiftStartTime, setShiftStartTime] = useState("");
+const [shiftEndTime, setShiftEndTime] = useState("");
+const [selectedEmploymentId, setSelectedEmploymentId] = useState("");
+const [shiftNote, setShiftNote] = useState("");
+const [creatingShift, setCreatingShift] = useState(false);
+const [successMessage, setSuccessMessage] = useState("");
+
+  useEffect(() => {
+  async function loadCreateFormData() {
+    setError("");
+
+    try {
+      const [jobResponse, employeeResponse] = await Promise.all([
+        api.get("/manager/job"),
+        api.get("/manager/employees"),
+      ]);
+
+      setJob(jobResponse.data);
+      setEmployees(employeeResponse.data);
+    } catch (err) {
+      const status = err.response?.status;
+      setError(
+        status === 401
+          ? "Your session has expired. Please log in again."
+          : status === 403
+            ? "Your account is not authorized to manage shifts."
+            : "Unable to load your job and employee list."
+      );
+    } finally {
+      setSetupLoading(false);
+    }
+  }
+
+  loadCreateFormData();
+}, []);
+
+async function createShift(event) {
+  event.preventDefault();
+  setError("");
+  setSuccessMessage("");
+
+  if (!selectedEmploymentId) {
+    setError("Select an employee.");
+    return;
+  }
+
+  const startAt = new Date(`${shiftDate}T${shiftStartTime}:00`);
+  const endAt = new Date(`${shiftDate}T${shiftEndTime}:00`);
+
+  if (
+    !shiftDate ||
+    !shiftStartTime ||
+    !shiftEndTime ||
+    Number.isNaN(startAt.getTime()) ||
+    Number.isNaN(endAt.getTime()) ||
+    endAt <= startAt
+  ) {
+    setError("Choose a valid date and make sure the end time is after the start time.");
+    return;
+  }
+
+  setCreatingShift(true);
+
+  try {
+    await api.post("/manager/shifts", {
+      employmentId: selectedEmploymentId,
+      startAt: startAt.toISOString(),
+      endAt: endAt.toISOString(),
+      note: shiftNote.trim() || null,
+    });
+
+    setSuccessMessage("Shift created successfully.");
+    setShiftNote("");
+  } catch (err) {
+    const status = err.response?.status;
+    setError(
+      status === 409
+        ? "This employee already has an overlapping shift."
+        : status === 401
+          ? "Your session has expired. Please log in again."
+          : status === 403
+            ? "Your account is not authorized to create shifts."
+            : "Unable to create the shift. Check the employee, date, and times."
+    );
+  } finally {
+    setCreatingShift(false);
+  }
+}
 
   async function loadShifts(event) {
     event.preventDefault();
@@ -85,6 +176,88 @@ function ManagerShifts() {
       <p className="manager-shifts__intro">
         View scheduled shifts for employees on your job.
       </p>
+
+      <div className="manager-shifts__job">
+  <strong>Assigned job:</strong>{" "}
+  {setupLoading ? "Loading..." : job?.title || "Job unavailable"}
+</div>
+
+<form className="manager-shifts__create-form" onSubmit={createShift}>
+  <label>
+    Employee
+    <select
+      value={selectedEmploymentId}
+      onChange={(event) => setSelectedEmploymentId(event.target.value)}
+      disabled={setupLoading || employees.length === 0}
+      required
+    >
+      <option value="">
+        {setupLoading ? "Loading employees..." : "Select an employee"}
+      </option>
+      {employees.map((employee) => (
+        <option key={employee.employmentId} value={employee.employmentId}>
+          {employee.name} ({employee.email})
+        </option>
+      ))}
+    </select>
+  </label>
+
+  <label>
+    Date
+    <input
+      type="date"
+      value={shiftDate}
+      onChange={(event) => setShiftDate(event.target.value)}
+      required
+    />
+  </label>
+
+  <label>
+    Start time
+    <input
+      type="time"
+      value={shiftStartTime}
+      onChange={(event) => setShiftStartTime(event.target.value)}
+      required
+    />
+  </label>
+
+  <label>
+    End time
+    <input
+      type="time"
+      value={shiftEndTime}
+      onChange={(event) => setShiftEndTime(event.target.value)}
+      required
+    />
+  </label>
+
+  <label className="manager-shifts__note">
+    Note (optional)
+    <textarea
+      value={shiftNote}
+      onChange={(event) => setShiftNote(event.target.value)}
+      rows="3"
+    />
+  </label>
+
+  {employees.length === 0 && !setupLoading && (
+    <p>No active employees are available for this job.</p>
+  )}
+
+  <button
+    type="submit"
+    disabled={setupLoading || creatingShift || employees.length === 0}
+  >
+    {creatingShift ? "Creating..." : "Create Shift"}
+  </button>
+</form>
+
+{successMessage && (
+  <p className="manager-shifts__success" role="status">
+    {successMessage}
+  </p>
+)}
 
       <form className="manager-shifts__filters" onSubmit={loadShifts}>
         <label>

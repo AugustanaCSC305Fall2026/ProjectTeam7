@@ -17,6 +17,8 @@ import edu.augustana.csc305.project.model.TimeEntry;
 import edu.augustana.csc305.project.repository.TimeEntryRepository;
 import edu.augustana.csc305.project.dto.ShiftDto;
 import edu.augustana.csc305.project.repository.ShiftRepository;
+import edu.augustana.csc305.project.dto.CreateShiftRequestDto;
+import edu.augustana.csc305.project.dto.ManagerCreateShiftRequest;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -227,6 +229,45 @@ public class ManagerService {
                 .map(shiftService::toDto)
                 .toList();
     }
+
+        public ShiftDto createEmployeeShift(
+        ObjectId managerId,
+        ManagerCreateShiftRequest request) {
+    Job job = findAssignedJob(managerId);
+
+    if (request == null
+            || request.employmentId() == null
+            || request.employmentId().isBlank()
+            || !ObjectId.isValid(request.employmentId())) {
+        throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, "INVALID_EMPLOYMENT_ID");
+    }
+
+    ObjectId employmentId = new ObjectId(request.employmentId());
+    Employment employment = employmentRepository.findById(employmentId)
+            .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "EMPLOYMENT_NOT_FOUND"));
+
+    if (!employment.isActive()) {
+        throw new ResponseStatusException(
+                HttpStatus.UNPROCESSABLE_ENTITY, "INACTIVE_EMPLOYMENT");
+    }
+
+    if (!job.getId().equals(employment.getJobId())) {
+        throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND, "EMPLOYMENT_NOT_FOUND_FOR_MANAGER");
+    }
+
+    CreateShiftRequestDto shiftRequest = new CreateShiftRequestDto(
+            employmentId.toHexString(),
+            job.getId().toHexString(),
+            request.startAt(),
+            request.endAt(),
+            request.note());
+
+    return shiftService.toDto(
+            shiftService.createShift(shiftRequest, managerId));
+}
 
     public TimeEntryDto editEmployeeTimeEntry(
             ObjectId managerId,
