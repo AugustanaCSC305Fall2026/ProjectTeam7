@@ -47,10 +47,15 @@ function Login() {
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
-      navigate(
-        user?.roles?.includes("ADMIN") ? "/supervisor" : "/",
-        { replace: true }
-      );
+      let destination = "/";
+
+      if (user?.roles?.includes("ADMIN")) {
+        destination = "/supervisor";
+      } else if (user?.roles?.includes("MANAGER")) {
+        destination = "/manager";
+      }
+
+      navigate(destination, { replace: true });
     } catch {
       // On failure, set an error message.
       setError('Invalid email or password.');

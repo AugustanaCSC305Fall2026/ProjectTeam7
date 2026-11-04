@@ -1,0 +1,132 @@
+.manager-hours h2,
+.manager-hours__employee h3 {
+  color: #194278;
+}
+
+.manager-hours__intro,
+.manager-hours__employee-header p {
+  color: #7b8581;
+}
+
+.manager-hours__employee {
+  margin-top: 18px;
+  padding: 20px;
+  border: 1px solid #e3e7e4;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.manager-hours__employee-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.manager-hours__employee-header h3,
+.manager-hours__employee-header p {
+  margin: 4px 0;
+}
+
+.manager-hours__employee-header strong {
+  color: #187957;
+}
+
+.manager-hours__table-wrapper {
+  overflow-x: auto;
+}
+
+.manager-hours__table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.manager-hours__table th,
+.manager-hours__table td {
+  padding: 11px 12px;
+  border-bottom: 1px solid #e3e7e4;
+  white-space: nowrap;
+}
+
+.manager-hours__table th {
+  color: #56615d;
+  font-size: 13px;
+}
+
+.manager-hours__empty {
+  color: #7b8581;
+}
+
+.manager-hours__error {
+  color: #a64242;
+}
+
+
+.manager-hours__message {
+  color: #187957;
+}
+
+.manager-hours__button,
+.manager-hours__cancel-button {
+  padding: 8px 12px;
+  border: 1px solid #17805c;
+  border-radius: 6px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.manager-hours__button {
+  background: #17805c;
+  color: #ffffff;
+}
+
+.manager-hours__cancel-button {
+  margin-left: 8px;
+  background: #ffffff;
+  color: #187957;
+}
+
+.manager-hours__button:disabled,
+.manager-hours__cancel-button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.manager-hours__edit-row td {
+  white-space: normal;
+  background: #f8fbf9;
+}
+
+.manager-hours__edit-row form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+}
+
+.manager-hours__edit-row label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: #56615d;
+  font-size: 13px;
+}
+
+.manager-hours__edit-row input {
+  padding: 8px;
+  border: 1px solid #d8dedb;
+  border-radius: 6px;
+  font: inherit;
+}
+
+
+@media (max-width: 640px) {
+  .manager-hours__employee-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+

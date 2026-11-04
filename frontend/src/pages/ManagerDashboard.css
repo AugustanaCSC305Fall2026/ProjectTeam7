@@ -1,0 +1,59 @@
+.manager-dashboard h2 {
+  margin: 0 0 8px;
+  color: #194278;
+}
+
+.manager-dashboard__intro {
+  margin: 0 0 24px;
+  color: #7b8581;
+}
+
+.manager-job-card {
+  margin-bottom: 20px;
+  padding: 22px;
+  border: 1px solid #e3e7e4;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.manager-job-card__label {
+  margin: 0 0 8px;
+  color: #7b8581;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.manager-job-card h3 {
+  margin: 0 0 8px;
+  color: #194278;
+}
+
+.manager-job-card p {
+  color: #56615d;
+}
+
+.manager-dashboard__actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.manager-dashboard__actions a {
+  padding: 18px;
+  border: 1px solid #e3e7e4;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #187957;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.manager-dashboard__actions a:hover {
+  border-color: #17805c;
+  background: #f8fbf9;
+}
+
+.manager-dashboard__error {
+  color: #a64242;
+}
