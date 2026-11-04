@@ -6,16 +6,29 @@ import "./Calendar.css";
 function Calendar() {
     const [shifts, setShifts] = useState([]);
     const [error, setError] = useState("");
+    const [currentMonth, setCurrentMonth] = useState(new Date());
 
     useEffect(() => {
         loadShifts();
-    }, []);
+    }, [currentMonth]);
 
     const loadShifts = async () => {
         try {
             setError("");
+            setShifts([]);
 
-            const response = await backendApi.get("/shifts/upcoming");
+            const year = currentMonth.getFullYear();
+            const month = currentMonth.getMonth();
+
+            const from = new Date(year, month, 1);
+            const to = new Date(year, month + 1, 1);
+
+            const response = await backendApi.get("/shifts/upcoming", {
+                params: {
+                    from: from.toISOString(),
+                    to: to.toISOString()
+                }
+            });
 
             setShifts(response.data);
         } catch (err) {
@@ -31,10 +44,9 @@ function Calendar() {
         });
     };
 
-    const today = new Date();
-
-    const year = today.getFullYear();
-    const month = today.getMonth();
+    
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
 
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -49,10 +61,29 @@ function Calendar() {
         calendarDays.push(day);
     }
 
-    const monthName = today.toLocaleDateString([], {
+    const monthName = currentMonth.toLocaleDateString([], {
         month: "long",
         year: "numeric"
     });
+
+    const getShiftsForDay = (day) => {
+        return shifts.filter((shift) => {
+            const shiftDate = new Date(shift.startAt);
+
+            return (
+                shiftDate.getDate() === day &&
+                shiftDate.getMonth() === month &&
+                shiftDate.getFullYear() === year
+            );
+        });
+    };
+    const previousMonth = () => {
+        setCurrentMonth(new Date(year, month - 1, 1));
+    };
+
+    const nextMonth = () => {
+        setCurrentMonth(new Date(year, month + 1, 1));
+    };
 
     return (
         <StudentLayout
@@ -72,7 +103,17 @@ function Calendar() {
                             WORK SCHEDULE
                         </span>
 
-                        <h2>{monthName}</h2>
+                        <div className="calendar-navigation">
+                            <button onClick={previousMonth}>
+                                Previous
+                            </button>
+
+                            <h2>{monthName}</h2>
+
+                            <button onClick={nextMonth}>
+                                Next
+                            </button>
+                        </div>
                     </div>
 
                     <span className="calendar-count">
@@ -95,9 +136,23 @@ function Calendar() {
                     {calendarDays.map((day, index) => (
                         <div className="calendar-day" key={index}>
                             {day && (
-                                <span className="calendar-day-number">
-                                    {day}
-                                </span>
+                                <>
+                                    <span className="calendar-day-number">
+                                        {day}
+                                    </span>
+
+                                    {getShiftsForDay(day).map((shift) => (
+                                        <div className="calendar-shift-event" key={shift.id}>
+                                            <strong>
+                                                {shift.jobTitle || "Scheduled Shift"}
+                                            </strong>
+
+                                            <span>
+                                                {formatTime(shift.startAt)} – {formatTime(shift.endAt)}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </>
                             )}
                         </div>
                     ))}
