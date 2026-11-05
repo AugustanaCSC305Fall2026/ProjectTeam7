@@ -195,8 +195,8 @@ function SupervisorJobs() {
   return (
   <section className="supervisor-jobs">
     <div className="supervisor-jobs__heading">
-      <h2>Jobs</h2>
-      <p>Create and manage campus jobs.</p>
+      <h2>Jobs &amp; Management</h2>
+      <p>Create jobs, manage manager accounts, and assign managers to campus jobs.</p>
     </div>
 
     {error && <p className="job-error" role="alert">{error}</p>}
@@ -244,6 +244,34 @@ function SupervisorJobs() {
       </button>
     </form>
 
+    <h3>Create Manager Account</h3>
+
+    <form className="job-form" onSubmit={handleCreateManager}>
+      <label>
+        First name
+        <input name="firstName" value={createManagerForm.firstName}
+          onChange={handleCreateManagerChange} required />
+      </label>
+      <label>
+        Last name
+        <input name="lastName" value={createManagerForm.lastName}
+          onChange={handleCreateManagerChange} required />
+      </label>
+      <label>
+        Email
+        <input type="email" name="email" value={createManagerForm.email}
+          onChange={handleCreateManagerChange} required />
+      </label>
+      <label>
+        Temporary password
+        <input type="password" name="password" minLength="8"
+          value={createManagerForm.password} onChange={handleCreateManagerChange} required />
+      </label>
+      <button type="submit" disabled={creatingManager}>
+        {creatingManager ? "Creating..." : "Create manager"}
+      </button>
+    </form>
+
     <h3>Assign Manager</h3>
 
     <form className="job-form" onSubmit={handleManagerAssignment}>
@@ -283,34 +311,6 @@ function SupervisorJobs() {
 
       <button type="submit" disabled={assigning}>
         {assigning ? "Assigning..." : "Assign Manager"}
-      </button>
-    </form>
-
-    <h3>Create Manager Account</h3>
-
-    <form className="job-form" onSubmit={handleCreateManager}>
-      <label>
-        First name
-        <input name="firstName" value={createManagerForm.firstName}
-          onChange={handleCreateManagerChange} required />
-      </label>
-      <label>
-        Last name
-        <input name="lastName" value={createManagerForm.lastName}
-          onChange={handleCreateManagerChange} required />
-      </label>
-      <label>
-        Email
-        <input type="email" name="email" value={createManagerForm.email}
-          onChange={handleCreateManagerChange} required />
-      </label>
-      <label>
-        Temporary password
-        <input type="password" name="password" minLength="8"
-          value={createManagerForm.password} onChange={handleCreateManagerChange} required />
-      </label>
-      <button type="submit" disabled={creatingManager}>
-        {creatingManager ? "Creating..." : "Create manager"}
       </button>
     </form>
 
