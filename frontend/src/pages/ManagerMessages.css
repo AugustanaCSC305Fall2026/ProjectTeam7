@@ -1,0 +1,53 @@
+.manager-messages {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 28px;
+  border: 1px solid #e3e7e4;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.manager-messages__heading h2 { margin: 0 0 8px; }
+.manager-messages__heading p { margin: 0 0 24px; color: #7b8581; }
+.manager-messages__error { padding: 10px 14px; border-radius: 6px; background: #fff1f1; color: #a64242; }
+
+.manager-messages__new {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 24px;
+}
+
+.manager-messages__new label { display: flex; flex-direction: column; gap: 6px; color: #56615d; font-weight: 600; }
+.manager-messages__new select,
+.manager-messages__composer textarea {
+  padding: 10px 12px;
+  border: 1px solid #d8dedb;
+  border-radius: 6px;
+  font: inherit;
+}
+.manager-messages__new select { min-width: 300px; }
+.manager-messages button { border: 0; border-radius: 6px; background: #17805c; color: white; padding: 10px 14px; font-weight: 600; cursor: pointer; }
+.manager-messages button:disabled { opacity: .6; cursor: not-allowed; }
+
+.manager-messages__layout { display: grid; grid-template-columns: 280px 1fr; min-height: 420px; border: 1px solid #e3e7e4; border-radius: 8px; overflow: hidden; }
+.manager-messages__conversations { border-right: 1px solid #e3e7e4; background: #f8faf9; }
+.manager-messages__conversations h3,
+.manager-messages__thread h3 { margin: 0; padding: 16px; border-bottom: 1px solid #e3e7e4; }
+.manager-messages__conversations button { display: flex; flex-direction: column; align-items: flex-start; width: 100%; border-radius: 0; background: transparent; color: #26322f; text-align: left; }
+.manager-messages__conversations button.selected { background: #e6f3ed; }
+.manager-messages__conversations button span { margin-top: 4px; overflow: hidden; color: #7b8581; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.manager-messages__thread { display: flex; flex-direction: column; }
+.manager-messages__history { flex: 1; padding: 16px; overflow-y: auto; }
+.manager-message { margin-bottom: 12px; padding: 10px 12px; border-radius: 8px; background: #f1f5f3; }
+.manager-message p { margin: 5px 0; white-space: pre-wrap; }
+.manager-message small { color: #7b8581; }
+.manager-messages__composer { display: flex; gap: 10px; padding: 16px; border-top: 1px solid #e3e7e4; }
+.manager-messages__composer textarea { flex: 1; min-height: 42px; resize: vertical; }
+
+@media (max-width: 700px) {
+  .manager-messages__new, .manager-messages__composer { align-items: stretch; flex-direction: column; }
+  .manager-messages__new select { min-width: 0; }
+  .manager-messages__layout { grid-template-columns: 1fr; }
+  .manager-messages__conversations { border-right: 0; border-bottom: 1px solid #e3e7e4; }
+}

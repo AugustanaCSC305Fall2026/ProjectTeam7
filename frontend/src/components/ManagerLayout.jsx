@@ -6,6 +6,7 @@ const managerNavItems = [
   { to: "/manager/employees", label: "Employees" },
   { to: "/manager/hours", label: "Hours" },
   { to: "/manager/shifts", label: "Shifts" },
+  { to: "/manager/messages", label: "Messages" },
 ];
 
 function ManagerLayout() {
