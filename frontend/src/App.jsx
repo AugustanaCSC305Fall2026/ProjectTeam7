@@ -17,6 +17,8 @@ import SupervisorAvailability from "./pages/SupervisorAvailability";
 import SupervisorAssignments from "./pages/SupervisorAssignments";
 import SupervisorJobs from "./pages/SupervisorJobs";
 import Availability from "./pages/Availability";
+import ManagerMessages from "./pages/ManagerMessages";
+import Messages from "./pages/Messages";
 import ManagerLayout from "./components/ManagerLayout";
 import ManagerDashboard from "./pages/ManagerDashboard";
 import ManagerEmployees from "./pages/ManagerEmployees";
@@ -82,6 +84,14 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: "/messages",
+    element: (
+      <ProtectedRoute>
+        <Messages />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: "/jobs",
     element: (
       <ProtectedRoute>
@@ -110,6 +120,10 @@ const router = createBrowserRouter([
         path: "shifts",
         element: <ManagerShifts />,
       },
+    {
+      path: "messages",
+      element: <ManagerMessages />,
+    },
     ],
   },
   {

@@ -10,6 +10,13 @@ import edu.augustana.csc305.project.dto.ManagerTimeEntryEditRequest;
 import edu.augustana.csc305.project.dto.TimeEntryDto;
 import edu.augustana.csc305.project.dto.ShiftDto;
 import edu.augustana.csc305.project.dto.ManagerCreateShiftRequest;
+import edu.augustana.csc305.project.dto.ManagerConversationDto;
+import edu.augustana.csc305.project.dto.CreateGroupConversationRequest;
+import edu.augustana.csc305.project.dto.GroupConversationDto;
+import edu.augustana.csc305.project.dto.MessageDto;
+import edu.augustana.csc305.project.dto.SendMessageRequest;
+import edu.augustana.csc305.project.dto.StartManagerConversationRequest;
+import edu.augustana.csc305.project.service.ManagerMessagingService;
 import edu.augustana.csc305.project.dto.ManagerJobApplicationStatusRequest;
 import edu.augustana.csc305.project.dto.ManagerEmployeeOptionDto;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -34,9 +41,12 @@ import java.util.List;
 @RequestMapping("/manager")
 public class ManagerController {
     private final ManagerService managerService;
+    private final ManagerMessagingService managerMessagingService;
 
-    public ManagerController(ManagerService managerService) {
+    public ManagerController(ManagerService managerService,
+                             ManagerMessagingService managerMessagingService) {
         this.managerService = managerService;
+        this.managerMessagingService = managerMessagingService;
     }
 
     @GetMapping("/job")
@@ -125,5 +135,54 @@ public class ManagerController {
             @RequestBody ManagerCreateShiftRequest request) {
         ObjectId managerId = new ObjectId(authenticatedUser.id());
         return managerService.createEmployeeShift(managerId, request);
+    }
+
+    @GetMapping("/messages/conversations")
+    public List<ManagerConversationDto> getConversations(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        return managerMessagingService.getConversations(new ObjectId(authenticatedUser.id()));
+    }
+
+    @PostMapping("/messages/conversations")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ManagerConversationDto startConversation(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @RequestBody StartManagerConversationRequest request) {
+        return managerMessagingService.startConversation(
+                new ObjectId(authenticatedUser.id()), request);
+    }
+
+    @GetMapping("/messages/groups")
+    public List<GroupConversationDto> getGroups(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        return managerMessagingService.getGroupConversations(
+                new ObjectId(authenticatedUser.id()));
+    }
+
+    @PostMapping("/messages/groups")
+    @ResponseStatus(HttpStatus.CREATED)
+    public GroupConversationDto createGroup(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @RequestBody CreateGroupConversationRequest request) {
+        return managerMessagingService.createGroup(
+                new ObjectId(authenticatedUser.id()), request);
+    }
+
+    @GetMapping("/messages/conversations/{conversationId}")
+    public List<MessageDto> getMessages(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @PathVariable String conversationId) {
+        return managerMessagingService.getMessages(
+                new ObjectId(authenticatedUser.id()), conversationId);
+    }
+
+    @PostMapping("/messages/conversations/{conversationId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public MessageDto sendMessage(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @PathVariable String conversationId,
+            @RequestBody SendMessageRequest request) {
+        return managerMessagingService.sendMessage(
+                new ObjectId(authenticatedUser.id()), conversationId, request);
     }
 }

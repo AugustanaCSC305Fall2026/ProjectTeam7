@@ -1,0 +1,14 @@
+.messaging-ui__layout { display: grid; grid-template-columns: 280px 1fr; min-height: 420px; border: 1px solid #e3e7e4; border-radius: 8px; overflow: hidden; }
+.messaging-ui__conversations { border-right: 1px solid #e3e7e4; background: #f8faf9; }
+.messaging-ui__conversations h3, .messaging-ui__thread h3 { margin: 0; padding: 16px; border-bottom: 1px solid #e3e7e4; }
+.messaging-ui__conversations button { display: flex; flex-direction: column; align-items: flex-start; width: 100%; border-radius: 0; background: transparent; color: #26322f; text-align: left; }
+.messaging-ui__conversations button.selected { background: #e6f3ed; }
+.messaging-ui__conversations button span { margin-top: 4px; overflow: hidden; color: #7b8581; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.messaging-ui__thread { display: flex; flex-direction: column; }
+.messaging-ui__history { flex: 1; padding: 16px; overflow-y: auto; }
+.messaging-ui__message { margin-bottom: 12px; padding: 10px 12px; border-radius: 8px; background: #f1f5f3; }
+.messaging-ui__message p { margin: 5px 0; white-space: pre-wrap; }
+.messaging-ui__message small { color: #7b8581; }
+.messaging-ui__composer { display: flex; gap: 10px; padding: 16px; border-top: 1px solid #e3e7e4; }
+.messaging-ui__composer textarea { flex: 1; min-height: 42px; padding: 10px 12px; border: 1px solid #d8dedb; border-radius: 6px; font: inherit; resize: vertical; }
+@media (max-width: 700px) { .messaging-ui__layout { grid-template-columns: 1fr; } .messaging-ui__conversations { border-right: 0; border-bottom: 1px solid #e3e7e4; } .messaging-ui__composer { align-items: stretch; flex-direction: column; } }

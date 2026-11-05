@@ -1,0 +1,11 @@
+.manager-messages { max-width: 1000px; margin: 0 auto; padding: 28px; border: 1px solid #e3e7e4; border-radius: 10px; background: #fff; }
+.manager-messages__heading h2 { margin: 0 0 8px; }
+.manager-messages__heading p { margin: 0 0 24px; color: #7b8581; }
+.manager-messages__error { padding: 10px 14px; border-radius: 6px; background: #fff1f1; color: #a64242; }
+.manager-messages__new { display: flex; gap: 12px; align-items: end; margin-bottom: 24px; }
+.manager-messages__new label { display: flex; flex-direction: column; gap: 6px; color: #56615d; font-weight: 600; }
+.manager-messages__new input, .manager-messages__new select { min-width: 220px; padding: 10px 12px; border: 1px solid #d8dedb; border-radius: 6px; font: inherit; }
+.manager-messages__new select[multiple] { min-height: 90px; }
+.manager-messages button { border: 0; border-radius: 6px; background: #17805c; color: white; padding: 10px 14px; font-weight: 600; cursor: pointer; }
+.manager-messages button:disabled { opacity: .6; cursor: not-allowed; }
+@media (max-width: 700px) { .manager-messages__new { align-items: stretch; flex-direction: column; } .manager-messages__new input, .manager-messages__new select { min-width: 0; } }

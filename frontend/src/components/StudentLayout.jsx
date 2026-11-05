@@ -4,6 +4,7 @@ import logo from "../assets/augustana-logo.png";
 
 const studentNavItems = [
   { to: "/", label: "Dashboard" },
+  { to: "/messages", label: "Messages" },
   { to: "/hours", label: "Hours" },
   { to: "/calendar", label: "Calendar" },
   { to: "/availability", label: "Availability" },
@@ -60,18 +61,6 @@ function StudentLayout({
           {item.label}
           </NavLink>))}
         </nav>
-
-                {showComingSoon && (
-          <>
-            <p className="sidebar-label coming-soon-label">COMING SOON</p>
-
-            <div className="student-nav future-nav">
-              <span>
-                Messages <small>SOON</small>
-              </span>
-            </div>
-          </>
-        )}
 
         <div className="sidebar-bottom">
           {showProfileLink && (
