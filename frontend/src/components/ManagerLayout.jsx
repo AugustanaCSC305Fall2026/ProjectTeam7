@@ -16,7 +16,6 @@ function ManagerLayout() {
       subtitle="Manage your assigned campus job."
       sectionLabel="MANAGE"
       navItems={managerNavItems}
-      showComingSoon={false}
       showProfileLink={false}
     >
       <Outlet />

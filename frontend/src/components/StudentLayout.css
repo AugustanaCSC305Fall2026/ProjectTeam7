@@ -78,23 +78,6 @@
   font-weight: 600;
 }
 
-.coming-soon-label {
-  margin-top: 32px;
-}
-
-.future-nav span {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 12px;
-  color: #9aa29f;
-  font-size: 14px;
-}
-
-.future-nav small {
-  font-size: 9px;
-  font-weight: 700;
-}
-
 .sidebar-bottom {
   margin-top: clamp(36px, 7vh, 72px);
   display: flex;

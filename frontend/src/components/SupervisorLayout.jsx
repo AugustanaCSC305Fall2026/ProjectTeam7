@@ -17,7 +17,6 @@ function SupervisorLayout() {
       subtitle="Manage campus employment."
       sectionLabel="MANAGE"
       navItems={supervisorNavItems}
-      showComingSoon={false}
       showProfileLink={false}
     >
       <Outlet />
