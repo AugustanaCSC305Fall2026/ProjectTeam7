@@ -21,7 +21,12 @@ public class UserEvents {
     public UserEvents() {
     }
 
-    public ObjectId getId() {return id;}
+    public ObjectId getId() {
+    return id;
+    }
+    public String getIdString() {
+        return id != null ? id.toHexString() : null;
+    }
 
     public void setId(ObjectId id) {this.id = id;}
 
