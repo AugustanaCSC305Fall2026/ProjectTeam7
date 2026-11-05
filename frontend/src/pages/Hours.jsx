@@ -6,6 +6,7 @@ import "./Hours.css";
 function Hours() {
     const [entries, setEntries] = useState([]);
     const [totalMinutes, setTotalMinutes] = useState(0);
+    const [totalGrossPayCents, setTotalGrossPayCents] = useState(0);
     const [selectedJobId, setSelectedJobId] = useState("");
     const [jobs, setJobs] = useState([]);
     const [error, setError] = useState("");
@@ -25,6 +26,7 @@ function Hours() {
 
             setEntries(response.data.entries);
             setTotalMinutes(response.data.totalMinutes);
+            setTotalGrossPayCents(response.data.totalGrossPayCents ?? 0);
 
             if (!jobId) {
                 const uniqueJobs = [];
@@ -165,6 +167,21 @@ function Hours() {
                         {selectedJobId
                             ? "Hours for selected job"
                             : "Hours across all jobs"}
+                    </p>
+                </section>
+
+                <section className="hours-summary-card">
+                    <span className="hours-label">GROSS PAY</span>
+                    <strong>
+                        {(totalGrossPayCents / 100).toLocaleString("en-US", {
+                            style: "currency",
+                            currency: "USD"
+                        })}
+                    </strong>
+                    <p>
+                        {selectedJobId
+                            ? "Gross earnings for selected job"
+                            : "Gross earnings across all jobs"}
                     </p>
                 </section>
 
