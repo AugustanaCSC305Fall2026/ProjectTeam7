@@ -9,6 +9,7 @@ function Calendar() {
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [userEvents, setUserEvents] = useState([]);
     const [showEventModal, setShowEventModal] = useState(false);
+    const [editingEventId, setEditingEventId] = useState(null);
     const [eventError, setEventError] = useState("");
     const [newEvent, setNewEvent] = useState({title: "",description: "",startTime: "",endTime: ""});
 
@@ -52,6 +53,26 @@ const loadUserEvents = async () => {
     }
 };
 
+const startEditingEvent = (event) => {
+    const formatDateTime = (date) => {
+        const d = new Date(date);
+        const localDate = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+        return localDate.toISOString().slice(0, 16);
+    };
+
+    setEditingEventId(event.idString);
+
+    setNewEvent({
+        title: event.title,
+        description: event.description || "",
+        startTime: formatDateTime(event.startTime),
+        endTime: formatDateTime(event.endTime)
+    });
+
+    setEventError("");
+    setShowEventModal(true);
+};
+
 const addEvent = async (e) => {
     e.preventDefault();
 
@@ -68,15 +89,27 @@ const addEvent = async (e) => {
             return;
         }
 
-        await backendApi.post("/user-events", {title: newEvent.title,description: newEvent.description,startTime: new Date(newEvent.startTime).toISOString(),endTime: new Date(newEvent.endTime).toISOString()});
+        
+    const eventData = {
+        title: newEvent.title,
+        description: newEvent.description,
+        startTime: new Date(newEvent.startTime).toISOString(),
+        endTime: new Date(newEvent.endTime).toISOString()
+    };
 
-        setNewEvent({title: "",description: "",startTime: "",endTime: ""});
-        setShowEventModal(false);
-        await loadUserEvents();
+    if (editingEventId) {
+        await backendApi.put(`/user-events/${editingEventId}`, eventData);
+    } else {
+        await backendApi.post("/user-events", eventData);
+    }
+    setNewEvent({title: "",description: "",startTime: "",endTime: ""});
+    setEditingEventId(null);
+    setShowEventModal(false);
+    await loadUserEvents();
 
     } catch (err) {
         console.error(err);
-        setEventError("Unable to create event.");
+        setEventError(editingEventId ? "Unable to update event." : "Unable to create event.");
     }
 };
 const deleteEvent = async (id) => {
@@ -192,7 +225,12 @@ const deleteEvent = async (id) => {
 
      <button
           className="calender-add-button"
-           onClick={() => setShowEventModal(true)}
+           onClick={() => {
+                setEditingEventId(null);
+                setNewEvent({title: "", description: "", startTime: "", endTime: ""});
+                setEventError("");
+                setShowEventModal(true);
+            }}
            >
            + Add Event
     </button>
@@ -230,16 +268,22 @@ const deleteEvent = async (id) => {
                                         </div>
                                     ))}
                                     {getUserEventsForDay(day).map((event) => (
-                                        <div className="calendar-user-event" key={event.id}>
+                                        <div className="calendar-user-event" key={event.idString}>
                                             <strong>{event.title}</strong>
 
                                             <span>
                                                 {formatTime(event.startTime)} – {formatTime(event.endTime)}
                                             </span>
+                                            <button
+                                                className="calendar-edit-event"
+                                                onClick={() => startEditingEvent(event)}
+                                            >
+                                                Edit
+                                            </button>
 
                                             <button
                                                 className="calendar-delete-event"
-                                                onClick={() => deleteEvent(event.id)}
+                                                onClick={() => deleteEvent(event.idString)}
                                             >
                                                 Delete
                                             </button>
@@ -257,7 +301,7 @@ const deleteEvent = async (id) => {
                         className="calendar-modal-content"
                         onSubmit={addEvent}
                     >
-                        <h2>Add New Event</h2>
+                        <h2>{editingEventId ? "Edit Event" : "Add New Event"}</h2>
 
                         {eventError && (
                             <p className="calendar-error">{eventError}</p>
@@ -316,13 +360,15 @@ const deleteEvent = async (id) => {
                         />
 
                         <button type="submit">
-                            Save Event
+                            {editingEventId ? "Save Changes" : "Save Event"}
                         </button>
 
                         <button
                             type="button"
                             onClick={() => {
                                 setShowEventModal(false);
+                                setEditingEventId(null);
+                                setNewEvent({title: "", description: "", startTime: "", endTime: ""});
                                 setEventError("");
                             }}
                         >
