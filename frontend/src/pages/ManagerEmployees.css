@@ -5,36 +5,38 @@
 
 .manager-employees__intro {
   color: #7b8581;
+  margin-bottom: 20px;
 }
 
-.manager-employee-form,
-.manager-employee-card {
-  display: flex;
-  gap: 16px;
+.manager-employee-form {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(150px, 200px) auto;
   align-items: end;
+  gap: 16px;
+  max-width: 980px;
   padding: 20px;
   border: 1px solid #e3e7e4;
   border-radius: 10px;
   background: #ffffff;
 }
 
-.manager-employee-form {
-  flex-wrap: wrap;
-}
-
 .manager-employee-form label {
   display: flex;
-  flex: 1;
-  min-width: 220px;
+  min-width: 0;
   flex-direction: column;
   gap: 6px;
   color: #56615d;
 }
 
-.manager-employee-form input {
+.manager-employee-form input,
+.manager-employee-form select {
+  width: 100%;
+  box-sizing: border-box;
   padding: 10px 12px;
   border: 1px solid #d8dedb;
   border-radius: 6px;
+  background: #ffffff;
+  color: #26322f;
   font: inherit;
 }
 
@@ -56,13 +58,20 @@
 }
 
 .manager-employee-list {
+  max-width: 980px;
   margin-top: 28px;
 }
 
 .manager-employee-card {
+  display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
   margin-top: 12px;
+  padding: 16px 20px;
+  border: 1px solid #e3e7e4;
+  border-radius: 10px;
+  background: #ffffff;
 }
 
 .manager-employee-card h4,
@@ -74,6 +83,23 @@
   color: #7b8581;
 }
 
+.manager-employee-card > div:nth-child(2) {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.manager-employee-card > div:nth-child(2) span {
+  color: #56615d;
+}
+
+.manager-employee-card > div:nth-child(2) button:last-child {
+  background: #ffffff;
+  color: #187957;
+}
+
 .manager-employees__message {
   color: #187957;
 }
@@ -82,10 +108,21 @@
   color: #a64242;
 }
 
-@media (max-width: 640px) {
-  .manager-employee-form,
+@media (max-width: 700px) {
+  .manager-employee-form {
+    grid-template-columns: 1fr;
+  }
+
+  .manager-employee-form button {
+    justify-self: start;
+  }
+
   .manager-employee-card {
-    align-items: stretch;
+    align-items: flex-start;
     flex-direction: column;
+  }
+
+  .manager-employee-card > div:nth-child(2) {
+    justify-content: flex-start;
   }
 }

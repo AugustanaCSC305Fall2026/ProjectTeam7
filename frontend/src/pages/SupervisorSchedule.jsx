@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import api from "../api/backendApi";
 import "./SupervisorSchedule.css";
 
 function SupervisorSchedule() {
+  const [jobs, setJobs] = useState([]);
+  const [jobsLoading, setJobsLoading] = useState(true);
+  const [jobsError, setJobsError] = useState("");
   const [form, setForm] = useState({
     jobId: "",
     employmentId: "",
@@ -14,6 +17,21 @@ function SupervisorSchedule() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
+    useEffect(() => {
+    const loadJobs = async () => {
+      try {
+        const response = await api.get("/admin/jobs");
+        setJobs(response.data);
+      } catch {
+        setJobsError("Unable to load jobs. Refresh the page and try again.");
+      } finally {
+        setJobsLoading(false);
+      }
+    };
+
+    loadJobs();
+  }, []);
 
   const updateField = (event) => {
     setForm((current) => ({
@@ -76,6 +94,8 @@ function SupervisorSchedule() {
       } else {
         setError(errorMessages[code] || code || "Unable to create the shift.");
       }
+
+      
     } finally {
       setSaving(false);
     }
@@ -84,20 +104,33 @@ function SupervisorSchedule() {
   return (
     <section className="supervisor-schedule">
       <h2>Create Shift</h2>
-      <p>Use an existing Job ID. Employment ID is optional.</p>
+      <p>Select a job for this shift. Employment ID is optional.</p>
 
       {message && <p role="status">{message}</p>}
       {error && <p role="alert">{error}</p>}
-
+      {jobsError && <p role="alert">{jobsError}</p>}
+      {!jobsLoading && !jobsError && jobs.length === 0 && (
+        <p role="status">No jobs are available. Create a job first.</p>
+      )}
       <form onSubmit={handleSubmit}>
-        <label>
-          Job ID
-          <input
+                <label>
+          Job
+          <select
             name="jobId"
             value={form.jobId}
             onChange={updateField}
             required
-          />
+            disabled={jobsLoading || Boolean(jobsError) || jobs.length === 0}
+          >
+            <option value="">
+              {jobsLoading ? "Loading jobs..." : "Select a job"}
+            </option>
+            {jobs.map((job) => (
+              <option key={job.id} value={job.id}>
+                {job.title}{job.department ? ` — ${job.department}` : ""}
+              </option>
+            ))}
+          </select>
         </label>
 
         <label>
@@ -151,7 +184,7 @@ function SupervisorSchedule() {
           />
         </label>
 
-        <button type="submit" disabled={saving}>
+        <button type="submit" disabled={saving || jobsLoading || Boolean(jobsError) || jobs.length === 0}>
           {saving ? "Creating..." : "Create Shift"}
         </button>
       </form>

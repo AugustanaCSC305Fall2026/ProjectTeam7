@@ -35,6 +35,7 @@
 }
 
 .supervisor-schedule input,
+.supervisor-schedule select,
 .supervisor-schedule textarea {
   width: 100%;
   padding: 10px 12px;
