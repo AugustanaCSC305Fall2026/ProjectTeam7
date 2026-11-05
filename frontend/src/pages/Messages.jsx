@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api/backendApi";
+import ConversationList from "../components/ConversationList";
+import MessageThread from "../components/MessageThread";
 import "./Messages.css";
 
 function Messages() {
@@ -99,41 +101,11 @@ function Messages() {
         <button type="submit" disabled={!recipientId}>Open conversation</button>
       </form>
 
-      <div className="messages-page__layout">
-        <aside className="messages-page__conversations">
-          <h3>Conversations</h3>
-          {conversations.length === 0 ? <p>No conversations yet.</p> : conversations.map((conversation) => (
-            <button type="button" key={conversation.id}
-              className={selectedConversation?.id === conversation.id ? "selected" : ""}
-              onClick={() => openConversation(conversation)}>
-              <strong>{conversation.type === "GROUP" ? conversation.name : conversation.otherUserName}</strong>
-              <span>{conversation.lastMessage || "No messages yet"}</span>
-            </button>
-          ))}
-        </aside>
-
-        <section className="messages-page__thread">
-          {selectedConversation ? (
-            <>
-              <h3>{selectedConversation.type === "GROUP"
-                ? selectedConversation.name : selectedConversation.otherUserName}</h3>
-              <div className="messages-page__history">
-                {messages.length === 0 ? <p>No messages yet. Send the first message.</p> : messages.map((message) => (
-                  <article className="messages-page__message" key={message.id}>
-                    <strong>{message.senderName}</strong>
-                    <p>{message.body}</p>
-                    <small>{new Date(message.sentAt).toLocaleString()}</small>
-                  </article>
-                ))}
-              </div>
-              <form className="messages-page__composer" onSubmit={handleSend}>
-                <textarea value={body} onChange={(event) => setBody(event.target.value)}
-                  placeholder="Write a message..." maxLength={2000} required />
-                <button type="submit" disabled={!body.trim()}>Send</button>
-              </form>
-            </>
-          ) : <p>Select a conversation to view messages.</p>}
-        </section>
+      <div className="messaging-ui__layout">
+        <ConversationList conversations={conversations} selectedId={selectedConversation?.id}
+          onSelect={openConversation} />
+        <MessageThread conversation={selectedConversation} messages={messages}
+          loading={false} body={body} setBody={setBody} onSend={handleSend} sending={false} />
       </div>
     </section>
   );

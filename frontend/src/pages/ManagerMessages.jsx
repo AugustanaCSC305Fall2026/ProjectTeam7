@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api/backendApi";
+import ConversationList from "../components/ConversationList";
+import MessageThread from "../components/MessageThread";
 import "./ManagerMessages.css";
 
 function ManagerMessages() {
@@ -179,69 +181,12 @@ function ManagerMessages() {
       </button>
     </form>
 
-      <div className="manager-messages__layout">
-        <aside className="manager-messages__conversations">
-          <h3>Conversations</h3>
-          {loading ? (
-            <p>Loading...</p>
-          ) : conversations.length === 0 ? (
-            <p>No conversations yet.</p>
-          ) : conversations.map((conversation) => (
-            <button
-              type="button"
-              className={selectedConversation?.id === conversation.id ? "selected" : ""}
-              key={conversation.id}
-              onClick={() => loadMessages(conversation)}
-            >
-              <strong>{conversation.employeeName}</strong>
-              <span>{conversation.lastMessage || "No messages yet"}</span>
-            </button>
-          ))}
-          {groups.length > 0 && <h3>Group chats</h3>}
-          {groups.map((group) => (
-            <button type="button"
-              className={selectedConversation?.id === group.id ? "selected" : ""}
-              key={group.id} onClick={() => loadMessages(group)}>
-              <strong>{group.name}</strong>
-              <span>{group.lastMessage || `${group.memberCount} members`}</span>
-            </button>
-          ))}
-        </aside>
-
-        <section className="manager-messages__thread">
-          {selectedConversation ? (
-            <>
-              <h3>{selectedConversation.employeeName || selectedConversation.name}</h3>
-              <div className="manager-messages__history">
-                {loadingMessages ? (
-                  <p>Loading messages...</p>
-                ) : messages.length === 0 ? (
-                  <p>No messages yet. Send the first message.</p>
-                ) : messages.map((message) => (
-                  <article key={message.id} className="manager-message">
-                    <strong>{message.senderName}</strong>
-                    <p>{message.body}</p>
-                    <small>{new Date(message.sentAt).toLocaleString()}</small>
-                  </article>
-                ))}
-              </div>
-              <form className="manager-messages__composer" onSubmit={handleSend}>
-                <textarea
-                  value={body}
-                  onChange={(event) => setBody(event.target.value)}
-                  placeholder="Write a message..."
-                  maxLength={2000}
-                  required
-                />
-                <button type="submit" disabled={sending || !body.trim()}>
-                  {sending ? "Sending..." : "Send"}
-                </button>
-              </form>
-            </>
-          ) : (
-            <p>Select a conversation to view messages.</p>
-          )}
-        </section>
+      <div className="messaging-ui__layout">
+        <ConversationList conversations={conversations} groups={groups}
+          selectedId={selectedConversation?.id} onSelect={loadMessages} />
+        <MessageThread conversation={selectedConversation} messages={messages}
+          loading={loadingMessages} body={body} setBody={setBody}
+          onSend={handleSend} sending={sending} />
       </div>
     </section>
   );
