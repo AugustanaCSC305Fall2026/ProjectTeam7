@@ -19,6 +19,7 @@ import edu.augustana.csc305.project.dto.ShiftDto;
 import edu.augustana.csc305.project.repository.ShiftRepository;
 import edu.augustana.csc305.project.dto.CreateShiftRequestDto;
 import edu.augustana.csc305.project.dto.ManagerCreateShiftRequest;
+import edu.augustana.csc305.project.dto.ManagerEmployeeOptionDto;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -62,8 +63,24 @@ public class ManagerService {
                 job.getId().toHexString(),
                 job.getTitle(),
                 job.getDepartment(),
-                job.getDescription());
+                job.getDescription(),
+                job.isAcceptingApplications());
     }
+
+    public void setAssignedJobApplications(
+                ObjectId managerId,
+                boolean acceptingApplications) {
+        Job job = findAssignedJob(managerId);
+
+        boolean updated = jobRepository.setAcceptingApplications(
+                job.getId(),
+                acceptingApplications);
+
+        if (!updated) {
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "MANAGER_JOB_NOT_FOUND");
+        }
+        }
 
     public List<ManagerEmployeeDto> getEmployees(ObjectId managerId) {
         Job job = findAssignedJob(managerId);
@@ -84,6 +101,27 @@ public class ManagerService {
 
         return employees;
     }
+
+    public List<ManagerEmployeeOptionDto> getEmployeeCandidates(
+                ObjectId managerId) {
+        Job job = findAssignedJob(managerId);
+
+        List<ObjectId> activeUserIds = employmentRepository
+                .findActiveByJobId(job.getId())
+                .stream()
+                .map(Employment::getUserId)
+                .toList();
+
+        return userRepository.findAll()
+                .stream()
+                .filter(user -> user.getRoles().contains("USER"))
+                .filter(user -> !activeUserIds.contains(user.getId()))
+                .map(user -> new ManagerEmployeeOptionDto(
+                        user.getId().toHexString(),
+                        user.getName(),
+                        user.getEmail()))
+                .toList();
+        }
 
     public List<ManagerEmployeeHoursDto> getEmployeeHours(ObjectId managerId) {
         Job job = findAssignedJob(managerId);

@@ -32,6 +32,17 @@ public class JobRepository {
         return results;
     }
 
+    public List<Job> findAcceptingApplications() {
+        List<Job> results = new ArrayList<>();
+
+        for (Job job : jobs.find(
+                Filters.eq("acceptingApplications", true))) {
+            results.add(job);
+        }
+
+        return results;
+    }
+
     public Optional<Job> findById(ObjectId id) {
         Job job = jobs.find(Filters.eq("_id", id)).first();
         return Optional.ofNullable(job);
@@ -56,5 +67,14 @@ public class JobRepository {
                 Filters.eq("_id", jobId),
                 Updates.set("managerId", managerId)
         );
+    }
+
+    public boolean setAcceptingApplications(
+            ObjectId jobId,
+            boolean acceptingApplications) {
+        return jobs.updateOne(
+                Filters.eq("_id", jobId),
+                Updates.set("acceptingApplications", acceptingApplications)
+        ).getMatchedCount() == 1;
     }
 }

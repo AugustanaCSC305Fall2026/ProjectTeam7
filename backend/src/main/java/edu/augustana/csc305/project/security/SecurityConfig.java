@@ -57,6 +57,7 @@ import java.util.List;
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/admin/corrections/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/manager/**").hasRole("MANAGER")
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/jobs/**").hasRole("USER")
                         .anyRequest().authenticated() // All other requests need a token
                 )
                 /*

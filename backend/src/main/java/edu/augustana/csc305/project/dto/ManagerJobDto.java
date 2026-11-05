@@ -4,6 +4,7 @@ public record ManagerJobDto(
         String id,
         String title,
         String department,
-        String description
+        String description,
+        boolean acceptingApplications
 ) {
 }
