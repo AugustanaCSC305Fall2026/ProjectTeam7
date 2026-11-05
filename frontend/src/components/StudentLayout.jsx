@@ -4,6 +4,7 @@ import logo from "../assets/augustana-logo.png";
 
 const studentNavItems = [
   { to: "/", label: "Dashboard" },
+  { to: "/messages", label: "Messages" },
   { to: "/hours", label: "Hours" },
   { to: "/calendar", label: "Calendar" },
   { to: "/availability", label: "Availability" },
@@ -67,9 +68,6 @@ function StudentLayout({
             <div className="student-nav future-nav">
               <span>
                 Jobs <small>SOON</small>
-              </span>
-              <span>
-                Messages <small>SOON</small>
               </span>
             </div>
           </>
