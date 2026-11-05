@@ -43,7 +43,13 @@ public class UserEventsRepository {
     }
 
     public void update(UserEvents event) {
-        events.replaceOne(Filters.and(Filters.eq("_id", event.getId()), Filters.eq("userId", event.getUserId())), event);
+        events.replaceOne(
+            Filters.and(
+                Filters.eq("_id", event.getId()),
+                Filters.eq("userId", event.getUserId())
+            ),
+            event
+        );
     }
 
     public boolean delete(ObjectId id, ObjectId userId) {
