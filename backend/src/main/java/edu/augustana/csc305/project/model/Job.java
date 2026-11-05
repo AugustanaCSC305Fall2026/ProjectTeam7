@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Job {
     @Id
     private ObjectId id;
+    private boolean acceptingApplications;
 
     private String title;
     private String department;
@@ -58,4 +59,12 @@ public class Job {
     public ObjectId getManagerId() {return managerId;}
 
     public void setManagerId(ObjectId managerId) {this.managerId = managerId;}
+
+    public boolean isAcceptingApplications() {
+        return acceptingApplications;
+    }
+    
+    public void setAcceptingApplications(boolean acceptingApplications) {
+        this.acceptingApplications = acceptingApplications;
+    }
 }

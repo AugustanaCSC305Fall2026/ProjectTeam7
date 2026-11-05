@@ -8,6 +8,8 @@ function ManagerDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [noJob, setNoJob] = useState(false);
+  const [updatingApplications, setUpdatingApplications] = useState(false);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     async function loadJob() {
@@ -34,6 +36,34 @@ function ManagerDashboard() {
     loadJob();
   }, []);
 
+  const toggleApplications = async () => {
+    const nextStatus = !job.acceptingApplications;
+    setUpdatingApplications(true);
+    setMessage("");
+
+    try {
+      await api.patch("/manager/job/applications", {
+        acceptingApplications: nextStatus,
+      });
+
+      setJob((currentJob) => ({
+        ...currentJob,
+        acceptingApplications: nextStatus,
+      }));
+
+      setMessage(
+        nextStatus
+          ? "Applications are now open."
+          : "Applications are now closed."
+      );
+    } catch (error) {
+      console.error(error);
+      setMessage("Could not update the application status.");
+    } finally {
+      setUpdatingApplications(false);
+    }
+  };
+
   return (
     <section className="manager-dashboard">
       <h2>Manager Dashboard</h2>
@@ -51,6 +81,27 @@ function ManagerDashboard() {
           <h3>{job.title}</h3>
           <p>{job.department}</p>
           {job.description && <p>{job.description}</p>}
+
+          <p>
+            Applications:{" "}
+            <strong>
+              {job.acceptingApplications ? "Open" : "Closed"}
+            </strong>
+          </p>
+
+          <button
+            type="button"
+            onClick={toggleApplications}
+            disabled={updatingApplications}
+          >
+            {updatingApplications
+              ? "Updating..."
+              : job.acceptingApplications
+                ? "Close applications"
+                : "Open applications"}
+          </button>
+
+          {message && <p role="status">{message}</p>}
         </article>
       )}
 
