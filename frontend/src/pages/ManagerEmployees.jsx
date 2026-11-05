@@ -10,6 +10,9 @@ function ManagerEmployees() {
   const [removingId, setRemovingId] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [candidates, setCandidates] = useState([]);
+  const [candidatesLoading, setCandidatesLoading] = useState(true);
+  const [pendingRemoval, setPendingRemoval] = useState(null);
 
   async function loadEmployees() {
     setLoading(true);
@@ -32,8 +35,23 @@ function ManagerEmployees() {
     }
   }
 
+  async function loadCandidates() {
+      setCandidatesLoading(true);
+
+      try {
+        const response = await api.get("/manager/employee-candidates");
+        setCandidates(response.data);
+      } catch (err) {
+        console.error(err);
+        setError("Unable to load employees you can add.");
+      } finally {
+        setCandidatesLoading(false);
+      }
+    }
+
   useEffect(() => {
     loadEmployees();
+    loadCandidates();
   }, []);
 
   function updateField(event) {
@@ -64,6 +82,7 @@ function ManagerEmployees() {
       setMessage("Employee added successfully.");
       setForm({ userId: "", hourlyRate: "" });
       await loadEmployees();
+      await loadCandidates();
     } catch (err) {
       const status = err.response?.status;
       const code = err.response?.data?.code || err.response?.data?.error;
@@ -87,16 +106,13 @@ function ManagerEmployees() {
   }
 
   async function handleRemove(employee) {
-    if (!window.confirm(`Deactivate ${employee.name} from your roster?`)) {
-      return;
-    }
-
     setError("");
     setMessage("");
     setRemovingId(employee.employmentId);
-
+    
     try {
       await api.delete(`/manager/employees/${employee.employmentId}`);
+      setPendingRemoval(null);
       setMessage(`${employee.name} was removed from your active roster.`);
       await loadEmployees();
     } catch {
@@ -118,13 +134,23 @@ function ManagerEmployees() {
 
       <form className="manager-employee-form" onSubmit={handleAdd}>
         <label>
-          Employee User ID
-          <input
+          Employee
+          <select
             name="userId"
             value={form.userId}
             onChange={updateField}
             required
-          />
+            disabled={candidatesLoading || adding}
+          >
+            <option value="">
+              {candidatesLoading ? "Loading employees..." : "Select an employee"}
+            </option>
+            {candidates.map((candidate) => (
+              <option key={candidate.userId} value={candidate.userId}>
+                {candidate.name} ({candidate.email})
+              </option>
+            ))}
+          </select>
         </label>
 
         <label>
@@ -160,15 +186,33 @@ function ManagerEmployees() {
                 <h4>{employee.name}</h4>
                 <p>{employee.email}</p>
               </div>
+              {pendingRemoval?.employmentId === employee.employmentId ? (
+              <div>
+                <span>Deactivate {employee.name}?</span>
+                <button
+                  type="button"
+                  onClick={() => handleRemove(employee)}
+                  disabled={removingId !== ""}
+                >
+                  {removingId === employee.employmentId ? "Removing..." : "Confirm"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPendingRemoval(null)}
+                  disabled={removingId !== ""}
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
               <button
                 type="button"
-                onClick={() => handleRemove(employee)}
+                onClick={() => setPendingRemoval(employee)}
                 disabled={removingId !== ""}
               >
-                {removingId === employee.employmentId
-                  ? "Removing..."
-                  : "Deactivate"}
+                Deactivate
               </button>
+            )}
             </article>
           ))
         )}
