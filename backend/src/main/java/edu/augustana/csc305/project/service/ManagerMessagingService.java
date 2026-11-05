@@ -1,6 +1,8 @@
 package edu.augustana.csc305.project.service;
 
 import edu.augustana.csc305.project.dto.ManagerConversationDto;
+import edu.augustana.csc305.project.dto.CreateGroupConversationRequest;
+import edu.augustana.csc305.project.dto.GroupConversationDto;
 import edu.augustana.csc305.project.dto.MessageDto;
 import edu.augustana.csc305.project.dto.SendMessageRequest;
 import edu.augustana.csc305.project.dto.StartManagerConversationRequest;
@@ -72,6 +74,57 @@ public class ManagerMessagingService {
         Message lastMessage = messageRepository
                 .findLatestByConversationId(conversation.getId()).orElse(null);
         return toConversationDto(conversation, employee, lastMessage);
+    }
+
+    public List<GroupConversationDto> getGroupConversations(ObjectId managerId) {
+        List<GroupConversationDto> results = new ArrayList<>();
+        for (Conversation conversation : conversationRepository.findByMemberId(managerId)) {
+            if (!"GROUP".equals(conversation.getType())) {
+                continue;
+            }
+            Message lastMessage = messageRepository
+                    .findLatestByConversationId(conversation.getId()).orElse(null);
+            results.add(new GroupConversationDto(
+                    conversation.getId().toHexString(), conversation.getName(),
+                    conversation.getMemberIds().size(), conversation.getUpdatedAt(),
+                    lastMessage == null ? null : lastMessage.getBody()));
+        }
+        results.sort((first, second) -> second.updatedAt().compareTo(first.updatedAt()));
+        return results;
+    }
+
+    public GroupConversationDto createGroup(
+            ObjectId managerId, CreateGroupConversationRequest request) {
+        Job job = findAssignedJob(managerId);
+        String name = request == null || request.name() == null
+                ? "" : request.name().trim();
+        if (name.isBlank() || name.length() > 100
+                || request.employeeIds() == null || request.employeeIds().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "GROUP_NAME_AND_EMPLOYEES_ARE_REQUIRED");
+        }
+
+        List<ObjectId> employeeIds = request.employeeIds().stream()
+                .map(value -> parseId(value, "employeeId"))
+                .distinct()
+                .toList();
+        if (employeeIds.size() > 50) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "GROUP_CANNOT_HAVE_MORE_THAN_50_EMPLOYEES");
+        }
+        for (ObjectId employeeId : employeeIds) {
+            findActiveEmployee(job, employeeId);
+        }
+
+        Date now = new Date();
+        List<ObjectId> members = new ArrayList<>();
+        members.add(managerId);
+        members.addAll(employeeIds);
+        Conversation conversation = new Conversation(
+                new ObjectId(), "GROUP", name, managerId, members, now, now);
+        conversationRepository.store(conversation);
+        return new GroupConversationDto(
+                conversation.getId().toHexString(), name, members.size(), now, null);
     }
 
     public List<MessageDto> getMessages(ObjectId managerId, String conversationIdValue) {

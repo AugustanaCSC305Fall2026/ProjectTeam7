@@ -88,18 +88,24 @@ public class UserMessagingService {
     public List<UserConversationDto> getConversations(ObjectId userId) {
         List<UserConversationDto> results = new ArrayList<>();
         for (Conversation conversation : conversationRepository.findByMemberId(userId)) {
-            if (!"DIRECT".equals(conversation.getType())) {
-                continue;
-            }
-            User otherUser = findOtherMember(conversation, userId);
             Message lastMessage = messageRepository
                     .findLatestByConversationId(conversation.getId()).orElse(null);
-            results.add(new UserConversationDto(
-                    conversation.getId().toHexString(),
-                    otherUser.getId().toHexString(),
-                    displayName(otherUser), otherUser.getEmail(),
-                    conversation.getUpdatedAt(),
-                    lastMessage == null ? null : lastMessage.getBody()));
+            if ("GROUP".equals(conversation.getType())) {
+                results.add(new UserConversationDto(
+                        conversation.getId().toHexString(), null, null, null,
+                        conversation.getUpdatedAt(),
+                        lastMessage == null ? null : lastMessage.getBody(),
+                        "GROUP", conversation.getName()));
+            } else {
+                User otherUser = findOtherMember(conversation, userId);
+                results.add(new UserConversationDto(
+                        conversation.getId().toHexString(),
+                        otherUser.getId().toHexString(),
+                        displayName(otherUser), otherUser.getEmail(),
+                        conversation.getUpdatedAt(),
+                        lastMessage == null ? null : lastMessage.getBody(),
+                        "DIRECT", null));
+            }
         }
         results.sort((first, second) -> second.updatedAt().compareTo(first.updatedAt()));
         return results;

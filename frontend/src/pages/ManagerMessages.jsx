@@ -5,9 +5,13 @@ import "./ManagerMessages.css";
 function ManagerMessages() {
   const [employees, setEmployees] = useState([]);
   const [conversations, setConversations] = useState([]);
+  const [groups, setGroups] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [employeeId, setEmployeeId] = useState("");
+  const [groupName, setGroupName] = useState("");
+  const [groupEmployeeIds, setGroupEmployeeIds] = useState([]);
+  const [creatingGroup, setCreatingGroup] = useState(false);
   const [body, setBody] = useState("");
   const [loading, setLoading] = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(false);
@@ -15,8 +19,12 @@ function ManagerMessages() {
   const [error, setError] = useState("");
 
   async function loadConversations() {
-    const response = await api.get("/manager/messages/conversations");
-    setConversations(response.data);
+    const [conversationResponse, groupResponse] = await Promise.all([
+      api.get("/manager/messages/conversations"),
+      api.get("/manager/messages/groups"),
+    ]);
+    setConversations(conversationResponse.data);
+    setGroups(groupResponse.data);
   }
 
   async function loadMessages(conversation) {
@@ -39,12 +47,14 @@ function ManagerMessages() {
   useEffect(() => {
     async function loadInitialData() {
       try {
-        const [employeesResponse, conversationsResponse] = await Promise.all([
+        const [employeesResponse, conversationsResponse, groupsResponse] = await Promise.all([
           api.get("/manager/employees"),
           api.get("/manager/messages/conversations"),
+          api.get("/manager/messages/groups"),
         ]);
         setEmployees(employeesResponse.data);
         setConversations(conversationsResponse.data);
+        setGroups(groupsResponse.data);
       } catch (err) {
         const status = err.response?.status;
         setError(
@@ -103,6 +113,27 @@ function ManagerMessages() {
     }
   }
 
+  async function handleCreateGroup(event) {
+    event.preventDefault();
+    if (!groupName.trim() || groupEmployeeIds.length === 0) return;
+    setCreatingGroup(true);
+    setError("");
+    try {
+      const response = await api.post("/manager/messages/groups", {
+        name: groupName,
+        employeeIds: groupEmployeeIds,
+      });
+      await loadConversations();
+      setGroupName("");
+      setGroupEmployeeIds([]);
+      await loadMessages(response.data);
+    } catch {
+      setError("Unable to create the group conversation.");
+    } finally {
+      setCreatingGroup(false);
+    }
+  }
+
   return (
     <section className="manager-messages">
       <div className="manager-messages__heading">
@@ -130,6 +161,24 @@ function ManagerMessages() {
         <button type="submit" disabled={!employeeId}>Open conversation</button>
       </form>
 
+    <form className="manager-messages__new" onSubmit={handleCreateGroup}>
+      <label htmlFor="group-name">Create a group chat</label>
+      <input id="group-name" value={groupName}
+        onChange={(event) => setGroupName(event.target.value)}
+        placeholder="Group name" maxLength={100} required />
+      <select multiple value={groupEmployeeIds}
+        onChange={(event) => setGroupEmployeeIds(
+          Array.from(event.target.selectedOptions, (option) => option.value)
+        )} required>
+        {employees.map((employee) => (
+          <option key={employee.userId} value={employee.userId}>{employee.name}</option>
+        ))}
+      </select>
+      <button type="submit" disabled={creatingGroup || groupEmployeeIds.length === 0}>
+        {creatingGroup ? "Creating..." : "Create group"}
+      </button>
+    </form>
+
       <div className="manager-messages__layout">
         <aside className="manager-messages__conversations">
           <h3>Conversations</h3>
@@ -148,12 +197,21 @@ function ManagerMessages() {
               <span>{conversation.lastMessage || "No messages yet"}</span>
             </button>
           ))}
+          {groups.length > 0 && <h3>Group chats</h3>}
+          {groups.map((group) => (
+            <button type="button"
+              className={selectedConversation?.id === group.id ? "selected" : ""}
+              key={group.id} onClick={() => loadMessages(group)}>
+              <strong>{group.name}</strong>
+              <span>{group.lastMessage || `${group.memberCount} members`}</span>
+            </button>
+          ))}
         </aside>
 
         <section className="manager-messages__thread">
           {selectedConversation ? (
             <>
-              <h3>{selectedConversation.employeeName}</h3>
+              <h3>{selectedConversation.employeeName || selectedConversation.name}</h3>
               <div className="manager-messages__history">
                 {loadingMessages ? (
                   <p>Loading messages...</p>

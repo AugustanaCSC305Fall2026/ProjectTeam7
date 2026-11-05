@@ -8,6 +8,8 @@ public record UserConversationDto(
         String otherUserName,
         String otherUserEmail,
         Date updatedAt,
-        String lastMessage
+        String lastMessage,
+        String type,
+        String name
 ) {
 }

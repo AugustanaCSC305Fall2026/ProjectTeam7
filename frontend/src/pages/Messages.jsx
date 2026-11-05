@@ -106,7 +106,7 @@ function Messages() {
             <button type="button" key={conversation.id}
               className={selectedConversation?.id === conversation.id ? "selected" : ""}
               onClick={() => openConversation(conversation)}>
-              <strong>{conversation.otherUserName}</strong>
+              <strong>{conversation.type === "GROUP" ? conversation.name : conversation.otherUserName}</strong>
               <span>{conversation.lastMessage || "No messages yet"}</span>
             </button>
           ))}
@@ -115,7 +115,8 @@ function Messages() {
         <section className="messages-page__thread">
           {selectedConversation ? (
             <>
-              <h3>{selectedConversation.otherUserName}</h3>
+              <h3>{selectedConversation.type === "GROUP"
+                ? selectedConversation.name : selectedConversation.otherUserName}</h3>
               <div className="messages-page__history">
                 {messages.length === 0 ? <p>No messages yet. Send the first message.</p> : messages.map((message) => (
                   <article className="messages-page__message" key={message.id}>
