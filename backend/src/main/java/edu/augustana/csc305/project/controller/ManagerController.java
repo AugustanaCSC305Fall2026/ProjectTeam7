@@ -10,6 +10,8 @@ import edu.augustana.csc305.project.dto.ManagerTimeEntryEditRequest;
 import edu.augustana.csc305.project.dto.TimeEntryDto;
 import edu.augustana.csc305.project.dto.ShiftDto;
 import edu.augustana.csc305.project.dto.ManagerCreateShiftRequest;
+import edu.augustana.csc305.project.dto.ManagerJobApplicationStatusRequest;
+import edu.augustana.csc305.project.dto.ManagerEmployeeOptionDto;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -44,11 +46,28 @@ public class ManagerController {
         return managerService.getAssignedJob(managerId);
     }
 
+    @PatchMapping("/job/applications")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void setAssignedJobApplications(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @RequestBody ManagerJobApplicationStatusRequest request) {
+        ObjectId managerId = new ObjectId(authenticatedUser.id());
+        managerService.setAssignedJobApplications(
+                managerId, request.acceptingApplications());
+    }
+
     @GetMapping("/employees")
     public List<ManagerEmployeeDto> getEmployees(
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
         ObjectId managerId = new ObjectId(authenticatedUser.id());
         return managerService.getEmployees(managerId);
+    }
+
+    @GetMapping("/employee-candidates")
+    public List<ManagerEmployeeOptionDto> getEmployeeCandidates(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        ObjectId managerId = new ObjectId(authenticatedUser.id());
+        return managerService.getEmployeeCandidates(managerId);
     }
 
     @GetMapping("/hours")

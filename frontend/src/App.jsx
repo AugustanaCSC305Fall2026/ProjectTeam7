@@ -22,6 +22,7 @@ import ManagerDashboard from "./pages/ManagerDashboard";
 import ManagerEmployees from "./pages/ManagerEmployees";
 import ManagerHours from "./pages/ManagerHours";
 import ManagerShifts from "./pages/ManagerShifts";
+import StudentJobs from "./pages/StudentJobs";
 
 /*
  * We use the react-router-dom library to load pages based
@@ -77,6 +78,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <Availability />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/jobs",
+    element: (
+      <ProtectedRoute>
+        <StudentJobs />
       </ProtectedRoute>
     ),
   },

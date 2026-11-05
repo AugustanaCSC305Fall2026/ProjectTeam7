@@ -1,21 +1,32 @@
 package edu.augustana.csc305.project.model;
 
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document(collection = "jobApplications")
 public class JobApplication {
-
+    @Id
     private ObjectId id;
 
     private ObjectId userId;
     private ObjectId jobId;
     private String applicationStatement = "";
-    private String status;
+    private String status = "PENDING";
 
+    public JobApplication() {
+    }
 
-    public JobApplication(ObjectId userId, ObjectId jobId, String status) {
+    public JobApplication(
+            ObjectId userId,
+            ObjectId jobId,
+            String applicationStatement) {
+        this.id = new ObjectId();
         this.userId = userId;
         this.jobId = jobId;
-        this.status = status;
+        this.applicationStatement = applicationStatement == null
+                ? ""
+                : applicationStatement;
     }
 
     public ObjectId getId() {
@@ -57,5 +68,4 @@ public class JobApplication {
     public void setStatus(String status) {
         this.status = status;
     }
-
 }

@@ -8,6 +8,9 @@ function Shifts() {
   const [openShifts, setOpenShifts] = useState([]);
   const [employments, setEmployments] = useState([]);
   const [message, setMessage] = useState("");
+  const [offerShiftId, setOfferShiftId] = useState("");
+  const [offerReason, setOfferReason] = useState("");
+  const [offeringShiftId, setOfferingShiftId] = useState("");
 
   const loadMyShifts = () => {
     api.get("/shifts/me")
@@ -58,28 +61,27 @@ function Shifts() {
     loadEmployments();
   }, []);
 
-  const offerShift = (shiftId) => {
-    const reason = window.prompt(
-      "Why are you offering this shift? (Optional)"
-    );
+  const offerShift = async (shiftId) => {
+    setMessage("");
+    setOfferingShiftId(shiftId);
 
-    if (reason === null) {
-      return;
-    }
+    try {
+        await api.post(`/shifts/${shiftId}/offer`, {
+        reason: offerReason.trim(),
+        });
 
-    api.post(`/shifts/${shiftId}/offer`, {
-      reason: reason
-    })
-      .then(() => {
         setMessage("Shift offered successfully.");
+        setOfferShiftId("");
+        setOfferReason("");
         loadMyShifts();
         loadOpenShifts();
-      })
-      .catch((error) => {
+    } catch (error) {
         console.error(error);
         setMessage("Could not offer shift.");
-      });
-  };
+    } finally {
+        setOfferingShiftId("");
+    }
+    };
 
   const withdrawOffer = (shiftId) => {
     api.delete(`/shifts/${shiftId}/offer`)
@@ -208,12 +210,53 @@ function Shifts() {
 
                     <div className="shift-actions">
                         {shift.status === "SCHEDULED" && (
-                        <button
+                        offerShiftId === shift.id ? (
+                            <form
+                            className="offer-shift-form"
+                            onSubmit={(event) => {
+                                event.preventDefault();
+                                offerShift(shift.id);
+                            }}
+                            >
+                            <label>
+                                Reason (optional)
+                                <textarea
+                                value={offerReason}
+                                onChange={(event) => setOfferReason(event.target.value)}
+                                rows="2"
+                                />
+                            </label>
+
+                            <button
+                                type="submit"
+                                className="offer-button"
+                                disabled={offeringShiftId === shift.id}
+                            >
+                                {offeringShiftId === shift.id ? "Offering..." : "Submit offer"}
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => {
+                                setOfferShiftId("");
+                                setOfferReason("");
+                                }}
+                                disabled={offeringShiftId === shift.id}
+                            >
+                                Cancel
+                            </button>
+                            </form>
+                        ) : (
+                            <button
                             className="offer-button"
-                            onClick={() => offerShift(shift.id)}
-                        >
+                            onClick={() => {
+                                setOfferShiftId(shift.id);
+                                setOfferReason("");
+                            }}
+                            >
                             Offer Shift
-                        </button>
+                            </button>
+                        )
                         )}
 
                         {shift.status === "OFFERED" && (
