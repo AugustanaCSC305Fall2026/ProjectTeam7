@@ -1,0 +1,84 @@
+.student-jobs__message {
+  margin-bottom: 16px;
+  color: #187957;
+}
+
+.student-jobs__state {
+  color: #7b8581;
+}
+
+.student-jobs__list {
+  display: grid;
+  gap: 16px;
+}
+
+.student-job-card {
+  padding: 20px;
+  border: 1px solid #e3e7e4;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.student-job-card__title {
+  margin: 0 0 6px;
+  color: #194278;
+}
+
+.student-job-card__department {
+  margin: 0 0 12px;
+  color: #7b8581;
+}
+
+.student-job-card__description {
+  margin: 0 0 20px;
+  color: #56615d;
+}
+
+.student-job-card__statement {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+  color: #56615d;
+  font-weight: 600;
+}
+
+.student-job-card__textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #d8dedb;
+  border-radius: 6px;
+  font: inherit;
+  resize: vertical;
+}
+
+.student-job-card__apply {
+  padding: 10px 16px;
+  border: 1px solid #17805c;
+  border-radius: 6px;
+  background: #17805c;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.student-job-card__apply:hover:not(:disabled) {
+  background: #126b4b;
+}
+
+.student-job-card__apply:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .student-job-card {
+    padding: 16px;
+  }
+
+  .student-job-card__apply {
+    width: 100%;
+  }
+}

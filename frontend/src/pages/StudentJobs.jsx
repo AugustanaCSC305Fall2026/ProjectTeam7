@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api/backendApi";
 import StudentLayout from "../components/StudentLayout";
+import "./StudentJobs.css";
 
 function StudentJobs() {
   const [jobs, setJobs] = useState([]);
@@ -43,26 +44,38 @@ function StudentJobs() {
       subtitle="Browse open campus jobs and submit an application."
       showComingSoon={false}
     >
-      {message && <p role="status">{message}</p>}
+      {message && (
+        <p className="student-jobs__message" role="status">
+          {message}
+        </p>
+      )}
 
       {loading ? (
-        <p>Loading available jobs…</p>
+        <p className="student-jobs__state">Loading available jobs…</p>
       ) : jobs.length === 0 ? (
-        <p>No jobs are currently accepting applications.</p>
+        <p className="student-jobs__state">
+          No jobs are currently accepting applications.
+        </p>
       ) : (
-        <div>
+        <div className="student-jobs__list">
           {jobs.map((job) => {
             const alreadyApplied = appliedJobIds.includes(job.id);
 
             return (
-              <article key={job.id}>
-                <h2>{job.title}</h2>
-                <p>{job.department}</p>
-                <p>{job.description}</p>
+              <article className="student-job-card" key={job.id}>
+                <h2 className="student-job-card__title">{job.title}</h2>
+                <p className="student-job-card__department">
+                  {job.department}
+                </p>
+                <p className="student-job-card__description">
+                  {job.description}
+                </p>
 
-                <label>
+                <label className="student-job-card__statement">
                   Application statement (optional)
                   <textarea
+                    className="student-job-card__textarea"
+                    rows={4}
                     value={statements[job.id] || ""}
                     onChange={(event) =>
                       setStatements((current) => ({
@@ -75,6 +88,7 @@ function StudentJobs() {
                 </label>
 
                 <button
+                  className="student-job-card__apply"
                   type="button"
                   onClick={() => applyToJob(job.id)}
                   disabled={alreadyApplied}

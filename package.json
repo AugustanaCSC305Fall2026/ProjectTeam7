@@ -1,0 +1,19 @@
+{
+  "name": "projectteam7",
+  "version": "1.0.0",
+  "description": "This repository contains backend and frontend code to use as a\r starting point for Augustana's CSC 305 semester project.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AugustanaCSC305Fall2026/ProjectTeam7.git"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/AugustanaCSC305Fall2026/ProjectTeam7/issues"
+  },
+  "homepage": "https://github.com/AugustanaCSC305Fall2026/ProjectTeam7#readme"
+}
