@@ -3,6 +3,7 @@ import StudentLayout from "./StudentLayout";
 
 const supervisorNavItems = [
   { to: "/supervisor", label: "Dashboard", end: true },
+  { to: "/supervisor/messages", label: "Messages" },
   { to: "/supervisor/availability", label: "Availability" },
   { to: "/supervisor/jobs", label: "Jobs" },
   { to: "/supervisor/assignments", label: "Job Assignments" },
@@ -10,7 +11,7 @@ const supervisorNavItems = [
   { to: "/supervisor/corrections", label: "Time Corrections" },
 ];
 
-function SupervisorLayout() {
+function SupervisorLayout({ children }) {
   return (
     <StudentLayout
       title="Supervisor"
@@ -19,7 +20,7 @@ function SupervisorLayout() {
       navItems={supervisorNavItems}
       showProfileLink={false}
     >
-      <Outlet />
+      {children || <Outlet />}
     </StudentLayout>
   );
 }

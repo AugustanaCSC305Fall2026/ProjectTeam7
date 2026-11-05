@@ -4,10 +4,11 @@ import ConversationList from "../components/ConversationList";
 import ContactPicker from "../components/ContactPicker";
 import MessageThread from "../components/MessageThread";
 import StudentLayout from "../components/StudentLayout";
+import SupervisorLayout from "../components/SupervisorLayout";
 import useMessagingConversation from "../components/useMessagingConversation";
 import "./Messages.css";
 
-function Messages() {
+function Messages({ supervisorMode = false }) {
   const [contacts, setContacts] = useState([]);
   const [conversations, setConversations] = useState([]);
   const [recipientId, setRecipientId] = useState("");
@@ -45,16 +46,20 @@ function Messages() {
     }
   }
 
+  const Layout = supervisorMode ? SupervisorLayout : StudentLayout;
+  const layoutProps = supervisorMode
+    ? {}
+    : { title: "Student", subtitle: "Stay connected with your campus team." };
+
   return (
-    <StudentLayout
-      title="Student"
-      subtitle="Stay connected with your campus team."
-    >
+    <Layout {...layoutProps}>
       <section className="messages-page messaging-page">
       <div className="messaging-page__heading">
         <div>
           <h2>Messages</h2>
-          <p>Contact your coworkers, managers, and supervisors.</p>
+          <p>{supervisorMode
+            ? "Message managers, employees, and campus staff."
+            : "Contact your coworkers, managers, and supervisors."}</p>
         </div>
       </div>
 
@@ -103,7 +108,7 @@ function Messages() {
         />
       </div>
       </section>
-    </StudentLayout>
+    </Layout>
   );
 }
 
