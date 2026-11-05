@@ -1,113 +1,114 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import api from "../api/backendApi";
 import ConversationList from "../components/ConversationList";
+import ContactPicker from "../components/ContactPicker";
 import MessageThread from "../components/MessageThread";
+import StudentLayout from "../components/StudentLayout";
+import SupervisorLayout from "../components/SupervisorLayout";
+import useMessagingConversation from "../components/useMessagingConversation";
 import "./Messages.css";
 
-function Messages() {
+function Messages({ supervisorMode = false }) {
   const [contacts, setContacts] = useState([]);
   const [conversations, setConversations] = useState([]);
-  const [selectedConversation, setSelectedConversation] = useState(null);
-  const [messages, setMessages] = useState([]);
   const [recipientId, setRecipientId] = useState("");
-  const [body, setBody] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [showNew, setShowNew] = useState(false);
 
-  async function refreshConversations() {
-    const response = await api.get("/messages/conversations");
-    setConversations(response.data);
-  }
-
-  async function openConversation(conversation) {
-    setSelectedConversation(conversation);
-    setError("");
-    try {
-      const response = await api.get(`/messages/conversations/${conversation.id}`);
-      setMessages(response.data);
-    } catch {
-      setError("Unable to load this conversation.");
-    }
-  }
-
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const [contactsResponse, conversationsResponse] = await Promise.all([
-          api.get("/messages/contacts"),
-          api.get("/messages/conversations"),
-        ]);
-        setContacts(contactsResponse.data);
-        setConversations(conversationsResponse.data);
-      } catch {
-        setError("Unable to load messaging.");
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadData();
+  const loadLists = useCallback(async () => {
+    const [contactsResponse, conversationsResponse] = await Promise.all([
+      api.get("/messages/contacts"),
+      api.get("/messages/conversations"),
+    ]);
+    setContacts(contactsResponse.data);
+    setConversations(conversationsResponse.data);
   }, []);
+
+  const messaging = useMessagingConversation({
+    loadLists,
+    messagesUrl: (conversationId) => `/messages/conversations/${conversationId}`,
+    sendUrl: (conversationId) => `/messages/conversations/${conversationId}`,
+    loadErrorMessage: "We could not load your messages. Check your connection and try again.",
+  });
 
   async function handleStart(event) {
     event.preventDefault();
     if (!recipientId) return;
     try {
       const response = await api.post("/messages/conversations", { recipientId });
-      await refreshConversations();
+      await loadLists();
       setRecipientId("");
-      await openConversation(response.data);
-    } catch (err) {
-      setError(err.response?.status === 403
-        ? "You cannot message that user."
-        : "Unable to start the conversation.");
+      setShowNew(false);
+      await messaging.openConversation(response.data);
+    } catch (requestError) {
+      messaging.setError(requestError.response?.status === 403
+        ? "You cannot message that person with your current work relationship."
+        : "We could not start that conversation. Try again.");
     }
   }
 
-  async function handleSend(event) {
-    event.preventDefault();
-    if (!selectedConversation || !body.trim()) return;
-    try {
-      const response = await api.post(
-        `/messages/conversations/${selectedConversation.id}`,
-        { body }
-      );
-      setMessages((current) => [...current, response.data]);
-      setBody("");
-      await refreshConversations();
-    } catch {
-      setError("Unable to send the message.");
-    }
-  }
+  const Layout = supervisorMode ? SupervisorLayout : StudentLayout;
+  const layoutProps = supervisorMode
+    ? {}
+    : { title: "Student", subtitle: "Stay connected with your campus team." };
 
   return (
-    <section className="messages-page">
-      <div className="messages-page__heading">
-        <h2>Messages</h2>
-        <p>Communicate with your coworkers, managers, and supervisors.</p>
+    <Layout {...layoutProps}>
+      <section className="messages-page messaging-page">
+      <div className="messaging-page__heading">
+        <div>
+          <h2>Messages</h2>
+          <p>{supervisorMode
+            ? "Message managers, employees, and campus staff."
+            : "Contact your coworkers, managers, and supervisors."}</p>
+        </div>
       </div>
-      {error && <p className="messages-page__error" role="alert">{error}</p>}
 
-      <form className="messages-page__new" onSubmit={handleStart}>
-        <label htmlFor="message-recipient">New conversation</label>
-        <select id="message-recipient" value={recipientId}
-          onChange={(event) => setRecipientId(event.target.value)} disabled={loading}>
-          <option value="">Select a person</option>
-          {contacts.map((contact) => (
-            <option key={contact.id} value={contact.id}>
-              {contact.name} — {contact.relationship}
-            </option>
-          ))}
-        </select>
-        <button type="submit" disabled={!recipientId}>Open conversation</button>
-      </form>
+      {messaging.error && (
+        <div className="messaging-page__alert" role="alert" aria-live="assertive">
+          <span className="messaging-page__alert-icon" aria-hidden="true">!</span>
+          <span>{messaging.error}</span>
+          <button type="button" onClick={messaging.loadData}>Try again</button>
+        </div>
+      )}
 
-      <div className="messaging-ui__layout">
-        <ConversationList conversations={conversations} selectedId={selectedConversation?.id}
-          onSelect={openConversation} />
-        <MessageThread conversation={selectedConversation} messages={messages}
-          loading={false} body={body} setBody={setBody} onSend={handleSend} sending={false} />
+      <div className={`messaging-ui__layout ${messaging.selectedConversation ? "has-selection" : ""}`}>
+        <ConversationList
+          conversations={conversations}
+          contacts={contacts}
+          selectedId={messaging.selectedConversation?.id}
+          onSelect={messaging.openConversation}
+          onNew={() => setShowNew(true)}
+          loading={messaging.loading}
+          newPanel={showNew && (
+            <form className="messaging-ui__new-panel" onSubmit={handleStart}>
+              <div className="messaging-ui__new-panel-heading">
+                <strong>New conversation</strong>
+                <button type="button" onClick={() => setShowNew(false)} aria-label="Close new conversation">×</button>
+              </div>
+              <label htmlFor="message-recipient">Choose a person</label>
+              <ContactPicker contacts={contacts} value={recipientId} onChange={setRecipientId}
+                disabled={messaging.loading || Boolean(messaging.error)} id="message-recipient" />
+              <button className="messaging-ui__primary-action" type="submit" disabled={!recipientId || messaging.loading || Boolean(messaging.error)}>
+                Start conversation
+              </button>
+            </form>
+          )}
+        />
+        <MessageThread
+          conversation={messaging.selectedConversation}
+          messages={messaging.messages}
+          loading={messaging.loadingMessages}
+          body={messaging.body}
+          setBody={messaging.setBody}
+          onSend={messaging.handleSend}
+          sending={messaging.sending}
+          sendError={messaging.sendError}
+          onRetry={() => messaging.sendMessage(messaging.failedBody)}
+          onBack={() => messaging.setSelectedConversation(null)}
+        />
       </div>
-    </section>
+      </section>
+    </Layout>
   );
 }
 

@@ -1,11 +1,12 @@
-.manager-messages { max-width: 1000px; margin: 0 auto; padding: 28px; border: 1px solid #e3e7e4; border-radius: 10px; background: #fff; }
-.manager-messages__heading h2 { margin: 0 0 8px; }
-.manager-messages__heading p { margin: 0 0 24px; color: #7b8581; }
-.manager-messages__error { padding: 10px 14px; border-radius: 6px; background: #fff1f1; color: #a64242; }
-.manager-messages__new { display: flex; gap: 12px; align-items: end; margin-bottom: 24px; }
-.manager-messages__new label { display: flex; flex-direction: column; gap: 6px; color: #56615d; font-weight: 600; }
-.manager-messages__new input, .manager-messages__new select { min-width: 220px; padding: 10px 12px; border: 1px solid #d8dedb; border-radius: 6px; font: inherit; }
-.manager-messages__new select[multiple] { min-height: 90px; }
-.manager-messages button { border: 0; border-radius: 6px; background: #17805c; color: white; padding: 10px 14px; font-weight: 600; cursor: pointer; }
-.manager-messages button:disabled { opacity: .6; cursor: not-allowed; }
-@media (max-width: 700px) { .manager-messages__new { align-items: stretch; flex-direction: column; } .manager-messages__new input, .manager-messages__new select { min-width: 0; } }
+.student-content:has(.manager-messages) { max-width: none; }
+.manager-messages .messaging-ui__layout { flex: 1; min-height: 0; }
+.manager-messages__new-panel form { display: flex; flex-direction: column; gap: 7px; padding: 10px 0 14px; border-bottom: 1px solid #dfeae3; }
+.manager-messages__new-panel form:last-child { padding-bottom: 0; border-bottom: 0; }
+.manager-messages__new-panel-or { display: flex; align-items: center; gap: 10px; margin: 2px 0; color: #9aa29f; font-size: 10px; font-weight: 700; letter-spacing: .08em; }
+.manager-messages__new-panel-or::before, .manager-messages__new-panel-or::after { height: 1px; flex: 1; background: #dfeae3; content: ""; }
+.manager-messages__form-title { display: flex; flex-direction: column; gap: 3px; margin-bottom: 2px; color: #26322f; font-size: 12px; }
+.manager-messages__form-title span, .manager-messages__selection-hint { color: #7b8581; font-size: 10px; font-weight: 400; }
+.manager-messages__new-panel label { color: #56615d; font-size: 11px; font-weight: 700; }
+.manager-messages__new-panel input { width: 100%; padding: 9px 10px; border: 1px solid #d8dedb; border-radius: 7px; background: #fff; color: #26322f; font: inherit; font-size: 12px; }
+.manager-messages__new-panel input:focus { outline: 2px solid #b9dfce; border-color: #17805c; }
+@media (max-width: 760px) { .manager-messages { height: calc(100vh - 150px); } }

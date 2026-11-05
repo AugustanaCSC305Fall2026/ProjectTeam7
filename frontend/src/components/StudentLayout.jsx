@@ -19,7 +19,6 @@ function StudentLayout({
   sectionLabel = "MAIN",
   userLabel,
   navItems = studentNavItems,
-  showComingSoon = true,
   showProfileLink = true,
 }) {
   const navigate = useNavigate();

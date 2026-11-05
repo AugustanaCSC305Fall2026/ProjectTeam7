@@ -42,7 +42,6 @@ function StudentJobs() {
     <StudentLayout
       title="Available Jobs"
       subtitle="Browse open campus jobs and submit an application."
-      showComingSoon={false}
     >
       {message && (
         <p className="student-jobs__message" role="status">
