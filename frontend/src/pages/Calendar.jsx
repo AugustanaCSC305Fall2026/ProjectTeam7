@@ -7,9 +7,14 @@ function Calendar() {
     const [shifts, setShifts] = useState([]);
     const [error, setError] = useState("");
     const [currentMonth, setCurrentMonth] = useState(new Date());
+    const [userEvents, setUserEvents] = useState([]);
+    const [showEventModal, setShowEventModal] = useState(false);
+    const [eventError, setEventError] = useState("");
+    const [newEvent, setNewEvent] = useState({title: "",description: "",startTime: "",endTime: ""});
 
     useEffect(() => {
         loadShifts();
+        loadUserEvents();
     }, [currentMonth]);
 
     const loadShifts = async () => {
@@ -36,6 +41,57 @@ function Calendar() {
             setError("Unable to load your schedule.");
         }
     };
+
+const loadUserEvents = async () => {
+    try {
+        const response = await backendApi.get("/user-events");
+        setUserEvents(response.data);
+    } catch (err) {
+        console.error(err);
+        setEventError("Unable to load your events.");
+    }
+};
+
+const addEvent = async (e) => {
+    e.preventDefault();
+
+    try {
+        setEventError("");
+
+        if (!newEvent.title || !newEvent.startTime || !newEvent.endTime) {
+            setEventError("Please fill in all required fields.");
+            return;
+        }
+
+        if (new Date(newEvent.endTime) <= new Date(newEvent.startTime)) {
+            setEventError("End time must be after start time.");
+            return;
+        }
+
+        await backendApi.post("/user-events", {title: newEvent.title,description: newEvent.description,startTime: new Date(newEvent.startTime).toISOString(),endTime: new Date(newEvent.endTime).toISOString()});
+
+        setNewEvent({title: "",description: "",startTime: "",endTime: ""});
+        setShowEventModal(false);
+        await loadUserEvents();
+
+    } catch (err) {
+        console.error(err);
+        setEventError("Unable to create event.");
+    }
+};
+const deleteEvent = async (id) => {
+    try {
+        setEventError("");
+
+        await backendApi.delete(`/user-events/${id}`);
+
+        await loadUserEvents();
+
+    } catch (err) {
+        console.error(err);
+        setEventError("Unable to delete event.");
+    }
+};
 
     const formatTime = (date) => {
         return new Date(date).toLocaleTimeString([], {
@@ -77,6 +133,19 @@ function Calendar() {
             );
         });
     };
+
+    const getUserEventsForDay = (day) => {
+        return userEvents.filter((event) => {
+            const eventDate = new Date(event.startTime);
+
+            return (
+                eventDate.getDate() === day &&
+                eventDate.getMonth() === month &&
+                eventDate.getFullYear() === year
+            );
+        });
+    };
+
     const previousMonth = () => {
         setCurrentMonth(new Date(year, month - 1, 1));
     };
@@ -116,10 +185,18 @@ function Calendar() {
                         </div>
                     </div>
 
-                    <span className="calendar-count">
-                        {shifts.length}{" "}
-                        {shifts.length === 1 ? "shift" : "shifts"}
-                    </span>
+    <div>
+        <span className="calendar-count">
+            {shifts.length} shifts · {userEvents.length} events
+        </span>
+
+     <button
+          className="calender-add-button"
+           onClick={() => setShowEventModal(true)}
+           >
+           + Add Event
+    </button>
+</div>
                 </div>
 
                 <div className="calendar-weekdays">
@@ -152,12 +229,108 @@ function Calendar() {
                                             </span>
                                         </div>
                                     ))}
+                                    {getUserEventsForDay(day).map((event) => (
+                                        <div className="calendar-user-event" key={event.id}>
+                                            <strong>{event.title}</strong>
+
+                                            <span>
+                                                {formatTime(event.startTime)} – {formatTime(event.endTime)}
+                                            </span>
+
+                                            <button
+                                                className="calendar-delete-event"
+                                                onClick={() => deleteEvent(event.id)}
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    ))}
                                 </>
                             )}
                         </div>
                     ))}
                 </div>
             </section>
+            {showEventModal && (
+                <div className="calendar-modal">
+                    <form
+                        className="calendar-modal-content"
+                        onSubmit={addEvent}
+                    >
+                        <h2>Add New Event</h2>
+
+                        {eventError && (
+                            <p className="calendar-error">{eventError}</p>
+                        )}
+
+                        <input
+                            type="text"
+                            placeholder="Event Title"
+                            value={newEvent.title}
+                            onChange={(e) =>
+                                setNewEvent({
+                                    ...newEvent,
+                                    title: e.target.value
+                                })
+                            }
+                            required
+                        />
+
+                        <textarea
+                            placeholder="Event Description"
+                            value={newEvent.description}
+                            onChange={(e) =>
+                                setNewEvent({
+                                    ...newEvent,
+                                    description: e.target.value
+                                })
+                            }
+                        />
+
+                        <label>Start Time</label>
+
+                        <input
+                            type="datetime-local"
+                            value={newEvent.startTime}
+                            onChange={(e) =>
+                                setNewEvent({
+                                    ...newEvent,
+                                    startTime: e.target.value
+                                })
+                            }
+                            required
+                        />
+
+                        <label>End Time</label>
+
+                        <input
+                            type="datetime-local"
+                            value={newEvent.endTime}
+                            onChange={(e) =>
+                                setNewEvent({
+                                    ...newEvent,
+                                    endTime: e.target.value
+                                })
+                            }
+                            required
+                        />
+
+                        <button type="submit">
+                            Save Event
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setShowEventModal(false);
+                                setEventError("");
+                            }}
+                        >
+                            Cancel
+                        </button>
+                    </form>
+                </div>
+            )}
         </StudentLayout>
     );
 }
