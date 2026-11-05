@@ -3,24 +3,24 @@ import StudentLayout from "./StudentLayout";
 
 const supervisorNavItems = [
   { to: "/supervisor", label: "Dashboard", end: true },
+  { to: "/supervisor/messages", label: "Messages" },
   { to: "/supervisor/availability", label: "Availability" },
-  { to: "/supervisor/jobs", label: "Jobs" },
+  { to: "/supervisor/jobs", label: "Jobs & Management" },
   { to: "/supervisor/assignments", label: "Job Assignments" },
   { to: "/supervisor/schedule", label: "Schedule" },
   { to: "/supervisor/corrections", label: "Time Corrections" },
 ];
 
-function SupervisorLayout() {
+function SupervisorLayout({ children }) {
   return (
     <StudentLayout
       title="Supervisor"
       subtitle="Manage campus employment."
       sectionLabel="MANAGE"
       navItems={supervisorNavItems}
-      showComingSoon={false}
       showProfileLink={false}
     >
-      <Outlet />
+      {children || <Outlet />}
     </StudentLayout>
   );
 }

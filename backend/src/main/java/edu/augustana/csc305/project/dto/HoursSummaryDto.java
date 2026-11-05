@@ -4,6 +4,7 @@ import java.util.List;
 
 public record HoursSummaryDto(
         List<HoursEntryDto> entries,
-        int totalMinutes
+        int totalMinutes,
+        long totalGrossPayCents
 ) {
 }

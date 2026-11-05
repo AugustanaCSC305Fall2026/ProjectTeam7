@@ -152,6 +152,10 @@ const router = createBrowserRouter([
       element: <SupervisorCorrections />,
     },
     {
+      path: "messages",
+      element: <Messages supervisorMode />,
+    },
+    {
       path: "availability",
       element: <SupervisorAvailability />,
     },

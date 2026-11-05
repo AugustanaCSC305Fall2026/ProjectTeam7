@@ -73,9 +73,40 @@ public class HoursService {
         }
 
         int totalMinutes = entries.stream()
-                .mapToInt(HoursEntryDto::workedMinutes)
-                .sum();
+            .mapToInt(HoursEntryDto::workedMinutes)
+            .sum();
 
-        return new HoursSummaryDto(entries, totalMinutes);
+    long totalGrossPayCents = 0;
+
+    for (TimeEntry timeEntry : timeEntries) {
+        Employment employment = employmentRepository
+                .findById(timeEntry.getEmploymentId())
+                .orElse(null);
+
+        if (employment == null) {
+            continue;
+        }
+
+        if (jobId != null && !jobId.equals(employment.getJobId())) {
+            continue;
+        }
+
+        if (jobRepository.findById(employment.getJobId()).isEmpty()) {
+            continue;
+        }
+
+        if (timeEntry.getClockOutAt() == null) {
+            continue;
+        }
+
+        long workedMinutes = timeEntry.getWorkedMinutes();
+        long payRateCents = employment.getPayRateCents();
+
+        totalGrossPayCents += Math.round(
+                workedMinutes * payRateCents / 60.0
+        );
+    }
+
+    return new HoursSummaryDto(entries, totalMinutes, totalGrossPayCents);
     }
 }
