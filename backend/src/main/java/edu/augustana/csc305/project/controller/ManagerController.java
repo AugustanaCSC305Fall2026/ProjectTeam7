@@ -18,6 +18,8 @@ import edu.augustana.csc305.project.dto.SendMessageRequest;
 import edu.augustana.csc305.project.dto.StartManagerConversationRequest;
 import edu.augustana.csc305.project.service.ManagerMessagingService;
 import edu.augustana.csc305.project.dto.ManagerJobApplicationStatusRequest;
+import edu.augustana.csc305.project.dto.ManagerJobApplicationDto;
+import edu.augustana.csc305.project.dto.ManagerReviewJobApplicationRequest;
 import edu.augustana.csc305.project.dto.ManagerEmployeeOptionDto;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -64,6 +66,24 @@ public class ManagerController {
         ObjectId managerId = new ObjectId(authenticatedUser.id());
         managerService.setAssignedJobApplications(
                 managerId, request.acceptingApplications());
+    }
+
+    @GetMapping("/applications")
+    public List<ManagerJobApplicationDto> getJobApplications(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        ObjectId managerId = new ObjectId(authenticatedUser.id());
+        return managerService.getJobApplications(managerId);
+    }
+
+    @PatchMapping("/applications/{applicationId}")
+    public ManagerJobApplicationDto reviewJobApplication(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @PathVariable String applicationId,
+            @RequestBody ManagerReviewJobApplicationRequest request) {
+        ObjectId managerId = new ObjectId(authenticatedUser.id());
+        String status = request == null ? null : request.status();
+        return managerService.reviewJobApplication(
+                managerId, applicationId, status);
     }
 
     @GetMapping("/employees")

@@ -1,11 +1,14 @@
 package edu.augustana.csc305.project.service;
 
 import edu.augustana.csc305.project.dto.ManagerEmployeeDto;
+import edu.augustana.csc305.project.dto.ManagerJobApplicationDto;
 import edu.augustana.csc305.project.dto.ManagerJobDto;
 import edu.augustana.csc305.project.model.Employment;
 import edu.augustana.csc305.project.model.Job;
+import edu.augustana.csc305.project.model.JobApplication;
 import edu.augustana.csc305.project.model.User;
 import edu.augustana.csc305.project.repository.EmploymentRepository;
+import edu.augustana.csc305.project.repository.JobApplicationRepository;
 import edu.augustana.csc305.project.repository.JobRepository;
 import edu.augustana.csc305.project.repository.UserRepository;
 import edu.augustana.csc305.project.dto.ManagerAddEmployeeRequest;
@@ -35,6 +38,7 @@ import java.util.List;
 @Service
 public class ManagerService {
     private final JobRepository jobRepository;
+    private final JobApplicationRepository jobApplicationRepository;
     private final EmploymentRepository employmentRepository;
     private final UserRepository userRepository;
     private final TimeEntryRepository timeEntryRepository;
@@ -43,12 +47,14 @@ public class ManagerService {
 
     public ManagerService(
             JobRepository jobRepository,
+            JobApplicationRepository jobApplicationRepository,
             EmploymentRepository employmentRepository,
             UserRepository userRepository,
             TimeEntryRepository timeEntryRepository,
             ShiftRepository shiftRepository,
             ShiftService shiftService) {
         this.jobRepository = jobRepository;
+        this.jobApplicationRepository = jobApplicationRepository;
         this.employmentRepository = employmentRepository;
         this.userRepository = userRepository;
         this.timeEntryRepository = timeEntryRepository;
@@ -81,6 +87,82 @@ public class ManagerService {
                         HttpStatus.NOT_FOUND, "MANAGER_JOB_NOT_FOUND");
         }
         }
+
+    public List<ManagerJobApplicationDto> getJobApplications(ObjectId managerId) {
+        Job job = findAssignedJob(managerId);
+
+        return jobApplicationRepository.findByJobId(job.getId())
+                .stream()
+                .map(this::toManagerJobApplicationDto)
+                .toList();
+    }
+
+    public ManagerJobApplicationDto reviewJobApplication(
+            ObjectId managerId,
+            String applicationIdValue,
+            String targetStatus) {
+        if (applicationIdValue == null || !ObjectId.isValid(applicationIdValue)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "INVALID_APPLICATION_ID");
+        }
+
+        if (!JobApplication.STATUS_APPROVED.equals(targetStatus)
+                && !JobApplication.STATUS_REJECTED.equals(targetStatus)
+                && !JobApplication.STATUS_WAITLISTED.equals(targetStatus)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "INVALID_APPLICATION_DECISION");
+        }
+
+        Job job = findAssignedJob(managerId);
+        ObjectId applicationId = new ObjectId(applicationIdValue);
+        JobApplication application = jobApplicationRepository
+                .findByIdAndJobId(applicationId, job.getId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "APPLICATION_NOT_FOUND"));
+
+        String currentStatus = application.getStatus();
+        if (currentStatus == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "APPLICATION_STATUS_TRANSITION_NOT_ALLOWED");
+        }
+
+        boolean pendingDecision = JobApplication.STATUS_PENDING.equals(currentStatus);
+        boolean waitlistedDecision = JobApplication.STATUS_WAITLISTED.equals(currentStatus)
+                && !JobApplication.STATUS_WAITLISTED.equals(targetStatus);
+
+        if (!pendingDecision && !waitlistedDecision) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "APPLICATION_STATUS_TRANSITION_NOT_ALLOWED");
+        }
+
+        boolean updated = jobApplicationRepository.updateStatusIfCurrentStatusIn(
+                applicationId,
+                job.getId(),
+                List.of(currentStatus),
+                targetStatus);
+        if (!updated) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "APPLICATION_ALREADY_REVIEWED");
+        }
+
+        application.setStatus(targetStatus);
+        return toManagerJobApplicationDto(application);
+    }
+
+    private ManagerJobApplicationDto toManagerJobApplicationDto(
+            JobApplication application) {
+        User applicant = userRepository.findById(application.getUserId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "APPLICATION_APPLICANT_NOT_FOUND"));
+
+        return new ManagerJobApplicationDto(
+                application.getId().toHexString(),
+                applicant.getId().toHexString(),
+                applicant.getName(),
+                applicant.getEmail(),
+                application.getApplicationStatement(),
+                application.getStatus());
+    }
 
     public List<ManagerEmployeeDto> getEmployees(ObjectId managerId) {
         Job job = findAssignedJob(managerId);
