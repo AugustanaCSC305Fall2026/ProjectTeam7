@@ -6,13 +6,18 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "jobApplications")
 public class JobApplication {
+    public static final String STATUS_PENDING = "PENDING";
+    public static final String STATUS_APPROVED = "APPROVED";
+    public static final String STATUS_REJECTED = "REJECTED";
+    public static final String STATUS_WAITLISTED = "WAITLISTED";
+
     @Id
     private ObjectId id;
 
     private ObjectId userId;
     private ObjectId jobId;
     private String applicationStatement = "";
-    private String status = "PENDING";
+    private String status = STATUS_PENDING;
 
     public JobApplication() {
     }
