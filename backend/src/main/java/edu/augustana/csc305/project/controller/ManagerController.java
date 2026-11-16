@@ -21,6 +21,10 @@ import edu.augustana.csc305.project.dto.ManagerJobApplicationStatusRequest;
 import edu.augustana.csc305.project.dto.ManagerJobApplicationDto;
 import edu.augustana.csc305.project.dto.ManagerReviewJobApplicationRequest;
 import edu.augustana.csc305.project.dto.ManagerEmployeeOptionDto;
+import edu.augustana.csc305.project.service.CorrectionRequestService;
+import edu.augustana.csc305.project.dto.CorrectionRequestDto;
+import edu.augustana.csc305.project.dto.PendingCorrectionDto;
+import edu.augustana.csc305.project.dto.ReviewCorrectionRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -44,11 +48,14 @@ import java.util.List;
 public class ManagerController {
     private final ManagerService managerService;
     private final ManagerMessagingService managerMessagingService;
+    private final CorrectionRequestService correctionRequestService;
 
     public ManagerController(ManagerService managerService,
-                             ManagerMessagingService managerMessagingService) {
+                             ManagerMessagingService managerMessagingService,
+                             CorrectionRequestService correctionRequestService) {
         this.managerService = managerService;
         this.managerMessagingService = managerMessagingService;
+        this.correctionRequestService = correctionRequestService;
     }
 
     @GetMapping("/job")
@@ -105,6 +112,39 @@ public class ManagerController {
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
         ObjectId managerId = new ObjectId(authenticatedUser.id());
         return managerService.getEmployeeHours(managerId);
+    }
+
+    @GetMapping("/corrections/pending")
+    public List<PendingCorrectionDto> getPendingCorrections(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+
+        ObjectId managerId = new ObjectId(authenticatedUser.id());
+
+        return correctionRequestService.getPendingCorrectionsForManager(managerId);
+    }
+
+    @PatchMapping("/corrections/{requestId}/approve")
+    public CorrectionRequestDto approveCorrection(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @PathVariable String requestId,
+            @RequestBody(required = false) ReviewCorrectionRequest request) {
+
+        ObjectId managerId = new ObjectId(authenticatedUser.id());
+
+        return correctionRequestService.approveForManager(
+                managerId, requestId, request);
+    }
+
+    @PatchMapping("/corrections/{requestId}/reject")
+    public CorrectionRequestDto rejectCorrection(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @PathVariable String requestId,
+            @RequestBody(required = false) ReviewCorrectionRequest request) {
+
+        ObjectId managerId = new ObjectId(authenticatedUser.id());
+
+        return correctionRequestService.rejectForManager(
+                managerId, requestId, request);
     }
 
     @PostMapping("/employees")
