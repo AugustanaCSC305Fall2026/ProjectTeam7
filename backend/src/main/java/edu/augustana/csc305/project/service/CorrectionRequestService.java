@@ -17,6 +17,8 @@ import edu.augustana.csc305.project.repository.UserRepository;
 import edu.augustana.csc305.project.dto.PendingCorrectionDto;
 import edu.augustana.csc305.project.model.User;
 import edu.augustana.csc305.project.dto.ReviewCorrectionRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.time.Instant;
@@ -47,17 +49,108 @@ public class CorrectionRequestService {
                 .toList();
     }
 
+    public List<PendingCorrectionDto> getPendingCorrectionsForManager(
+        ObjectId managerId) {
+
+        Job managerJob = findManagerJob(managerId);
+
+        return correctionRequestRepository.findPending()
+                .stream()
+                .filter(request -> {
+                        TimeEntry entry = timeEntryRepository
+                                .findByIdAndUserId(
+                                        request.getTimeEntryId(),
+                                        request.getUserId())
+                                .orElse(null);
+
+                        if (entry == null) {
+                        return false;
+                        }
+
+                        return employmentRepository
+                                .findById(entry.getEmploymentId())
+                                .map(employment ->
+                                        managerJob.getId().equals(employment.getJobId()))
+                                .orElse(false);
+                })
+                .map(this::toPendingCorrectionDto)
+                .toList();
+        }
+        private Job findManagerJob(ObjectId managerId) {
+                List<Job> jobs = jobRepository.findByManagerId(managerId);
+
+                if (jobs.isEmpty()) {
+                        throw new ResponseStatusException(
+                                HttpStatus.NOT_FOUND, "MANAGER_JOB_NOT_FOUND");
+                }
+
+                if (jobs.size() > 1) {
+                        throw new ResponseStatusException(
+                                HttpStatus.CONFLICT, "MANAGER_HAS_MULTIPLE_JOBS");
+                }
+
+                return jobs.get(0);
+        }
+
+        public CorrectionRequestDto approveForManager(
+                ObjectId managerId,
+                String requestId,
+                ReviewCorrectionRequest reviewRequest) {
+                        verifyManagerCorrectionAccess(managerId, requestId);
+                        return approve(requestId, reviewRequest);
+        }
+
+        public CorrectionRequestDto rejectForManager(
+                ObjectId managerId,
+                String requestId,
+                ReviewCorrectionRequest reviewRequest) {
+                        verifyManagerCorrectionAccess(managerId, requestId);
+                        return reject(requestId, reviewRequest);
+        }
+
+        private void verifyManagerCorrectionAccess(
+                ObjectId managerId,
+                String requestId) {
+
+                Job managerJob = findManagerJob(managerId);
+
+                ObjectId correctionId =
+                        parseObjectId(requestId, "correctionRequestId");
+
+                CorrectionRequest request = correctionRequestRepository
+                        .findPendingById(correctionId)
+                        .orElseThrow(() -> new CorrectionException(
+                                "CORRECTION_NOT_PENDING"));
+
+                TimeEntry entry = timeEntryRepository
+                        .findByIdAndUserId(
+                                request.getTimeEntryId(),
+                                request.getUserId())
+                        .orElseThrow(() -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND, "TIME_ENTRY_NOT_FOUND"));
+
+                Employment employment = employmentRepository
+                        .findById(entry.getEmploymentId())
+                        .orElseThrow(() -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND, "EMPLOYMENT_NOT_FOUND"));
+
+                if (!managerJob.getId().equals(employment.getJobId())) {
+                        throw new ResponseStatusException(
+                                HttpStatus.NOT_FOUND, "CORRECTION_NOT_FOUND");
+                }
+        }
+
         public CorrectionRequestDto approve(
             String requestId,
             ReviewCorrectionRequest reviewRequest) {
-        return review(requestId, CorrectionStatus.APPROVED, reviewRequest);
-    }
+                return review(requestId, CorrectionStatus.APPROVED, reviewRequest);
+        }
 
     public CorrectionRequestDto reject(
             String requestId,
             ReviewCorrectionRequest reviewRequest) {
-        return review(requestId, CorrectionStatus.REJECTED, reviewRequest);
-    }
+                return review(requestId, CorrectionStatus.REJECTED, reviewRequest);
+        }
 
     private CorrectionRequestDto review(
             String requestId,

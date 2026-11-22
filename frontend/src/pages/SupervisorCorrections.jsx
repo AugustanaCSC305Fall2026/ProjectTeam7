@@ -25,7 +25,7 @@ function fromDateTimeLocal(value) {
   return value ? new Date(value).toISOString() : null;
 }
 
-function SupervisorCorrections() {
+function SupervisorCorrections({ basePath = "/admin/corrections" }) {
   const [requests, setRequests] = useState([]);
   const [reviewNotes, setReviewNotes] = useState({});
   const [reviewTimes, setReviewTimes] = useState({});
@@ -39,7 +39,7 @@ function SupervisorCorrections() {
     setError("");
 
     try {
-      const response = await api.get("/admin/corrections/pending");
+      const response = await api.get(`${basePath}/pending`);
       setRequests(response.data);
     } catch (err) {
       const status = err.response?.status;
@@ -60,7 +60,7 @@ function SupervisorCorrections() {
 
   useEffect(() => {
     loadRequests();
-  }, []);
+  }, [basePath]);
 
     const reviewRequest = async (request, decision) => {
     const requestId = request.correctionRequestId;
@@ -89,7 +89,7 @@ function SupervisorCorrections() {
       }
 
       await api.patch(
-        `/admin/corrections/${requestId}/${decision}`,
+        `${basePath}/${requestId}/${decision}`,
         payload
       );
 
