@@ -118,6 +118,10 @@ const router = createBrowserRouter([
         element: <ManagerHours />,
       },
       {
+        path: "corrections",
+        element: <SupervisorCorrections basePath="/manager/corrections" />,
+      },
+      {
         path: "shifts",
         element: <ManagerShifts />,
       },
