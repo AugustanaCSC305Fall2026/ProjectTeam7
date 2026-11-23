@@ -7,6 +7,82 @@
   color: #7b8581;
 }
 
+.student-jobs__applications {
+  margin-bottom: 32px;
+}
+
+.student-jobs__section-heading {
+  margin-bottom: 16px;
+}
+
+.student-jobs__section-heading h2 {
+  margin: 0 0 6px;
+  color: #244f86;
+}
+
+.student-jobs__section-heading p {
+  margin: 0;
+  color: #7b8581;
+}
+
+.student-jobs__available-heading {
+  margin-top: 8px;
+}
+
+.student-jobs__application-list {
+  display: grid;
+  gap: 12px;
+}
+
+.student-application-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 16px 20px;
+  border: 1px solid #e3e7e4;
+  border-radius: 10px;
+  background: #f8fbf9;
+}
+
+.student-application-card h3 {
+  margin: 0 0 4px;
+  color: #26322f;
+}
+
+.student-application-card__department {
+  margin: 0;
+  color: #7b8581;
+}
+
+.student-application-card__status {
+  flex: 0 0 auto;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #fff3d9;
+  color: #815d12;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.student-application-card__status--approved {
+  background: #e6f3ed;
+  color: #187957;
+}
+
+.student-application-card__status--rejected {
+  background: #fff1f1;
+  color: #a64242;
+}
+
+.student-application-card__statement {
+  flex: 1 1 100%;
+  margin: 0;
+  color: #56615d;
+  white-space: pre-wrap;
+}
+
 .student-jobs__list {
   display: grid;
   gap: 16px;
@@ -74,6 +150,11 @@
 }
 
 @media (max-width: 600px) {
+  .student-application-card {
+    flex-direction: column;
+    padding: 16px;
+  }
+
   .student-job-card {
     padding: 16px;
   }

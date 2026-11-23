@@ -3,6 +3,7 @@ package edu.augustana.csc305.project.controller;
 import edu.augustana.csc305.project.dto.AvailableJobDto;
 import edu.augustana.csc305.project.dto.JobApplicationDto;
 import edu.augustana.csc305.project.dto.SubmitJobApplicationRequest;
+import edu.augustana.csc305.project.dto.UserJobApplicationDto;
 import edu.augustana.csc305.project.security.AuthenticatedUser;
 import edu.augustana.csc305.project.service.JobApplicationService;
 import org.bson.types.ObjectId;
@@ -31,6 +32,13 @@ public class JobApplicationController {
     @GetMapping("/open")
     public List<AvailableJobDto> getAvailableJobs() {
         return jobApplicationService.getAvailableJobs();
+    }
+
+    @GetMapping("/applications")
+    public List<UserJobApplicationDto> getMyApplications(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        ObjectId userId = new ObjectId(authenticatedUser.id());
+        return jobApplicationService.getApplicationsForUser(userId);
     }
 
     @PostMapping("/{jobId}/applications")

@@ -3,6 +3,7 @@ package edu.augustana.csc305.project.service;
 import edu.augustana.csc305.project.dto.AvailableJobDto;
 import edu.augustana.csc305.project.dto.JobApplicationDto;
 import edu.augustana.csc305.project.dto.SubmitJobApplicationRequest;
+import edu.augustana.csc305.project.dto.UserJobApplicationDto;
 import edu.augustana.csc305.project.model.Job;
 import edu.augustana.csc305.project.model.JobApplication;
 import edu.augustana.csc305.project.repository.JobApplicationRepository;
@@ -34,6 +35,25 @@ public class JobApplicationService {
                         job.getTitle(),
                         job.getDepartment(),
                         job.getDescription()))
+                .toList();
+    }
+
+    public List<UserJobApplicationDto> getApplicationsForUser(ObjectId userId) {
+        return jobApplicationRepository.findByUserId(userId)
+                .stream()
+                .map(application -> {
+                    Job job = jobRepository.findById(application.getJobId())
+                            .orElseThrow(() -> new ResponseStatusException(
+                                    HttpStatus.NOT_FOUND, "APPLICATION_JOB_NOT_FOUND"));
+
+                    return new UserJobApplicationDto(
+                            application.getId().toHexString(),
+                            job.getId().toHexString(),
+                            job.getTitle(),
+                            job.getDepartment(),
+                            application.getApplicationStatement(),
+                            application.getStatus());
+                })
                 .toList();
     }
 

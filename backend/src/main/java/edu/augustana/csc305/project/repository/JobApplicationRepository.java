@@ -35,6 +35,17 @@ public class JobApplicationRepository {
         return Optional.ofNullable(application);
     }
 
+    public List<JobApplication> findByUserId(ObjectId userId) {
+        List<JobApplication> results = new ArrayList<>();
+
+        for (JobApplication application : applications.find(
+                Filters.eq("userId", userId))) {
+            results.add(application);
+        }
+
+        return results;
+    }
+
     public List<JobApplication> findByJobId(ObjectId jobId) {
         List<JobApplication> results = new ArrayList<>();
 
