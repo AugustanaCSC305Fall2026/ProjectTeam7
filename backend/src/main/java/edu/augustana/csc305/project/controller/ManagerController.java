@@ -26,6 +26,8 @@ import edu.augustana.csc305.project.dto.CorrectionRequestDto;
 import edu.augustana.csc305.project.dto.PendingCorrectionDto;
 import edu.augustana.csc305.project.dto.ReviewCorrectionRequest;
 import org.springframework.format.annotation.DateTimeFormat;
+import edu.augustana.csc305.project.dto.SupervisorAvailabilityDto;
+import edu.augustana.csc305.project.service.AvailabilityService;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.bson.types.ObjectId;
@@ -49,13 +51,16 @@ public class ManagerController {
     private final ManagerService managerService;
     private final ManagerMessagingService managerMessagingService;
     private final CorrectionRequestService correctionRequestService;
+    private final AvailabilityService availabilityService;
 
     public ManagerController(ManagerService managerService,
                              ManagerMessagingService managerMessagingService,
-                             CorrectionRequestService correctionRequestService) {
+                             CorrectionRequestService correctionRequestService,
+                             AvailabilityService availabilityService) {
         this.managerService = managerService;
         this.managerMessagingService = managerMessagingService;
         this.correctionRequestService = correctionRequestService;
+        this.availabilityService = availabilityService;
     }
 
     @GetMapping("/job")
@@ -98,6 +103,15 @@ public class ManagerController {
             @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
         ObjectId managerId = new ObjectId(authenticatedUser.id());
         return managerService.getEmployees(managerId);
+    }
+    @GetMapping("/availability")
+    public List<SupervisorAvailabilityDto> getEmployeeAvailability(
+            @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+
+        ObjectId managerId = new ObjectId(authenticatedUser.id());
+
+        return managerService.getEmployeeAvailability(
+                managerId, availabilityService);
     }
 
     @GetMapping("/employee-candidates")

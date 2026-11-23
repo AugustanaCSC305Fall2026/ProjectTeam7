@@ -23,6 +23,8 @@ import edu.augustana.csc305.project.repository.ShiftRepository;
 import edu.augustana.csc305.project.dto.CreateShiftRequestDto;
 import edu.augustana.csc305.project.dto.ManagerCreateShiftRequest;
 import edu.augustana.csc305.project.dto.ManagerEmployeeOptionDto;
+import edu.augustana.csc305.project.dto.SupervisorAvailabilityDto;
+import edu.augustana.csc305.project.dto.AvailabilityResponse;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -182,6 +184,23 @@ public class ManagerService {
         }
 
         return employees;
+    }
+    public List<SupervisorAvailabilityDto> getEmployeeAvailability(
+        ObjectId managerId,
+        AvailabilityService availabilityService) {
+
+        return getEmployees(managerId).stream()
+                .map(employee -> {
+                        AvailabilityResponse availability =
+                                availabilityService.getForUser(
+                                        new ObjectId(employee.id()));
+
+                        return new SupervisorAvailabilityDto(
+                                employee.id(),
+                                employee.name(),
+                                availability.windows());
+                })
+                .toList();
     }
 
     public List<ManagerEmployeeOptionDto> getEmployeeCandidates(
