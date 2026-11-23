@@ -24,6 +24,8 @@ import ManagerDashboard from "./pages/ManagerDashboard";
 import ManagerEmployees from "./pages/ManagerEmployees";
 import ManagerHours from "./pages/ManagerHours";
 import ManagerShifts from "./pages/ManagerShifts";
+import ManagerApplications from "./pages/ManagerApplications";
+import ManagerCalendar from "./pages/ManagerCalendar";
 import StudentJobs from "./pages/StudentJobs";
 
 /*
@@ -117,8 +119,20 @@ const router = createBrowserRouter([
         element: <ManagerHours />,
       },
       {
+        path: "corrections",
+        element: <SupervisorCorrections basePath="/manager/corrections" />,
+      },
+      {
         path: "shifts",
         element: <ManagerShifts />,
+      },
+      {
+        path: "calendar",
+        element: <ManagerCalendar />,
+      },
+      {
+        path: "applications",
+        element: <ManagerApplications />,
       },
     {
       path: "messages",

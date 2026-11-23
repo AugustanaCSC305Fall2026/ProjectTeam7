@@ -3,11 +3,14 @@ package edu.augustana.csc305.project.repository;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import edu.augustana.csc305.project.model.JobApplication;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -30,6 +33,42 @@ public class JobApplicationRepository {
         )).first();
 
         return Optional.ofNullable(application);
+    }
+
+    public List<JobApplication> findByJobId(ObjectId jobId) {
+        List<JobApplication> results = new ArrayList<>();
+
+        for (JobApplication application : applications.find(
+                Filters.eq("jobId", jobId))) {
+            results.add(application);
+        }
+
+        return results;
+    }
+
+    public Optional<JobApplication> findByIdAndJobId(
+            ObjectId applicationId,
+            ObjectId jobId) {
+        JobApplication application = applications.find(Filters.and(
+                Filters.eq("_id", applicationId),
+                Filters.eq("jobId", jobId)
+        )).first();
+
+        return Optional.ofNullable(application);
+    }
+
+    public boolean updateStatusIfCurrentStatusIn(
+            ObjectId applicationId,
+            ObjectId jobId,
+            List<String> currentStatuses,
+            String newStatus) {
+        return applications.updateOne(Filters.and(
+                        Filters.eq("_id", applicationId),
+                        Filters.eq("jobId", jobId),
+                        Filters.in("status", currentStatuses)
+                ),
+                Updates.set("status", newStatus)
+        ).getMatchedCount() == 1;
     }
 
     public void storeApplication(JobApplication application) {

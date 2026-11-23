@@ -1,11 +1,14 @@
 package edu.augustana.csc305.project.service;
 
 import edu.augustana.csc305.project.dto.ManagerEmployeeDto;
+import edu.augustana.csc305.project.dto.ManagerJobApplicationDto;
 import edu.augustana.csc305.project.dto.ManagerJobDto;
 import edu.augustana.csc305.project.model.Employment;
 import edu.augustana.csc305.project.model.Job;
+import edu.augustana.csc305.project.model.JobApplication;
 import edu.augustana.csc305.project.model.User;
 import edu.augustana.csc305.project.repository.EmploymentRepository;
+import edu.augustana.csc305.project.repository.JobApplicationRepository;
 import edu.augustana.csc305.project.repository.JobRepository;
 import edu.augustana.csc305.project.repository.UserRepository;
 import edu.augustana.csc305.project.dto.ManagerAddEmployeeRequest;
@@ -20,6 +23,8 @@ import edu.augustana.csc305.project.repository.ShiftRepository;
 import edu.augustana.csc305.project.dto.CreateShiftRequestDto;
 import edu.augustana.csc305.project.dto.ManagerCreateShiftRequest;
 import edu.augustana.csc305.project.dto.ManagerEmployeeOptionDto;
+import edu.augustana.csc305.project.dto.SupervisorAvailabilityDto;
+import edu.augustana.csc305.project.dto.AvailabilityResponse;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -35,6 +40,7 @@ import java.util.List;
 @Service
 public class ManagerService {
     private final JobRepository jobRepository;
+    private final JobApplicationRepository jobApplicationRepository;
     private final EmploymentRepository employmentRepository;
     private final UserRepository userRepository;
     private final TimeEntryRepository timeEntryRepository;
@@ -43,12 +49,14 @@ public class ManagerService {
 
     public ManagerService(
             JobRepository jobRepository,
+            JobApplicationRepository jobApplicationRepository,
             EmploymentRepository employmentRepository,
             UserRepository userRepository,
             TimeEntryRepository timeEntryRepository,
             ShiftRepository shiftRepository,
             ShiftService shiftService) {
         this.jobRepository = jobRepository;
+        this.jobApplicationRepository = jobApplicationRepository;
         this.employmentRepository = employmentRepository;
         this.userRepository = userRepository;
         this.timeEntryRepository = timeEntryRepository;
@@ -82,6 +90,82 @@ public class ManagerService {
         }
         }
 
+    public List<ManagerJobApplicationDto> getJobApplications(ObjectId managerId) {
+        Job job = findAssignedJob(managerId);
+
+        return jobApplicationRepository.findByJobId(job.getId())
+                .stream()
+                .map(this::toManagerJobApplicationDto)
+                .toList();
+    }
+
+    public ManagerJobApplicationDto reviewJobApplication(
+            ObjectId managerId,
+            String applicationIdValue,
+            String targetStatus) {
+        if (applicationIdValue == null || !ObjectId.isValid(applicationIdValue)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "INVALID_APPLICATION_ID");
+        }
+
+        if (!JobApplication.STATUS_APPROVED.equals(targetStatus)
+                && !JobApplication.STATUS_REJECTED.equals(targetStatus)
+                && !JobApplication.STATUS_WAITLISTED.equals(targetStatus)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "INVALID_APPLICATION_DECISION");
+        }
+
+        Job job = findAssignedJob(managerId);
+        ObjectId applicationId = new ObjectId(applicationIdValue);
+        JobApplication application = jobApplicationRepository
+                .findByIdAndJobId(applicationId, job.getId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "APPLICATION_NOT_FOUND"));
+
+        String currentStatus = application.getStatus();
+        if (currentStatus == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "APPLICATION_STATUS_TRANSITION_NOT_ALLOWED");
+        }
+
+        boolean pendingDecision = JobApplication.STATUS_PENDING.equals(currentStatus);
+        boolean waitlistedDecision = JobApplication.STATUS_WAITLISTED.equals(currentStatus)
+                && !JobApplication.STATUS_WAITLISTED.equals(targetStatus);
+
+        if (!pendingDecision && !waitlistedDecision) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "APPLICATION_STATUS_TRANSITION_NOT_ALLOWED");
+        }
+
+        boolean updated = jobApplicationRepository.updateStatusIfCurrentStatusIn(
+                applicationId,
+                job.getId(),
+                List.of(currentStatus),
+                targetStatus);
+        if (!updated) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "APPLICATION_ALREADY_REVIEWED");
+        }
+
+        application.setStatus(targetStatus);
+        return toManagerJobApplicationDto(application);
+    }
+
+    private ManagerJobApplicationDto toManagerJobApplicationDto(
+            JobApplication application) {
+        User applicant = userRepository.findById(application.getUserId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "APPLICATION_APPLICANT_NOT_FOUND"));
+
+        return new ManagerJobApplicationDto(
+                application.getId().toHexString(),
+                applicant.getId().toHexString(),
+                applicant.getName(),
+                applicant.getEmail(),
+                application.getApplicationStatement(),
+                application.getStatus());
+    }
+
     public List<ManagerEmployeeDto> getEmployees(ObjectId managerId) {
         Job job = findAssignedJob(managerId);
         List<ManagerEmployeeDto> employees = new ArrayList<>();
@@ -100,6 +184,23 @@ public class ManagerService {
         }
 
         return employees;
+    }
+    public List<SupervisorAvailabilityDto> getEmployeeAvailability(
+        ObjectId managerId,
+        AvailabilityService availabilityService) {
+
+        return getEmployees(managerId).stream()
+                .map(employee -> {
+                        AvailabilityResponse availability =
+                                availabilityService.getForUser(
+                                        new ObjectId(employee.id()));
+
+                        return new SupervisorAvailabilityDto(
+                                employee.id(),
+                                employee.name(),
+                                availability.windows());
+                })
+                .toList();
     }
 
     public List<ManagerEmployeeOptionDto> getEmployeeCandidates(

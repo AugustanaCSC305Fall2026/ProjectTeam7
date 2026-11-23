@@ -82,10 +82,16 @@
   padding: 10px 12px;
   border: 1px solid #d8dedb;
   border-radius: 6px;
+  background-color: #ffffff;
   color: #26322f;
+  color-scheme: light;
   font: inherit;
 }
 
+.correction-time-fields input:focus {
+  outline: 2px solid #194278;
+  outline-offset: 1px;
+}
 .correction-card button {
   margin-right: 10px;
   padding: 9px 14px;
@@ -95,6 +101,8 @@
   color: #ffffff;
   font-weight: 600;
   cursor: pointer;
+  background-color: #ffffff;
+  color: #26322f;
 }
 
 .correction-card button + button {
@@ -106,4 +114,9 @@
 .correction-card button:disabled {
   opacity: 0.65;
   cursor: wait;
+}
+.correction-card textarea {
+  background-color: #ffffff;
+  color: #26322f;
+  color-scheme: light;
 }

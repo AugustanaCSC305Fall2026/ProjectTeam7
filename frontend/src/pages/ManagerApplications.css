@@ -1,0 +1,161 @@
+.manager-applications {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.manager-applications__heading {
+  margin-bottom: 24px;
+}
+
+.manager-applications__heading h2 {
+  margin: 0 0 8px;
+  color: #244f86;
+}
+
+.manager-applications__heading p,
+.manager-applications__state {
+  margin: 0;
+  color: #7b8581;
+}
+
+.manager-applications__message,
+.manager-applications__error {
+  margin: 0 0 18px;
+  padding: 12px 16px;
+  border-radius: 8px;
+}
+
+.manager-applications__message {
+  background: #e6f3ed;
+  color: #187957;
+}
+
+.manager-applications__error {
+  background: #fff1f1;
+  color: #a64242;
+}
+
+.manager-applications__list {
+  display: grid;
+  gap: 16px;
+}
+
+.manager-application-card {
+  padding: 22px;
+  border: 1px solid #e0e6e2;
+  border-radius: 10px;
+  background: #ffffff;
+  text-align: left;
+}
+
+.manager-application-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.manager-application-card__header h3 {
+  margin: 0 0 6px;
+  color: #26322f;
+}
+
+.manager-application-card__header a {
+  color: #287f61;
+  overflow-wrap: anywhere;
+}
+
+.manager-application-card__status {
+  flex: 0 0 auto;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #edf0ef;
+  color: #56615d;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.manager-application-card__status--pending,
+.manager-application-card__status--waitlisted {
+  background: #fff3d9;
+  color: #815d12;
+}
+
+.manager-application-card__status--approved {
+  background: #e6f3ed;
+  color: #187957;
+}
+
+.manager-application-card__status--rejected {
+  background: #fff1f1;
+  color: #a64242;
+}
+
+.manager-application-card__statement {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #edf0ee;
+}
+
+.manager-application-card__statement h4 {
+  margin: 0 0 8px;
+  color: #56615d;
+  font-size: 13px;
+}
+
+.manager-application-card__statement p {
+  margin: 0;
+  color: #3d4945;
+  white-space: pre-wrap;
+}
+
+.manager-application-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.manager-application-card__actions button,
+.manager-applications__retry {
+  padding: 9px 14px;
+  border: 1px solid #17805c;
+  border-radius: 6px;
+  background: #17805c;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.manager-application-card__actions .manager-application-card__waitlist {
+  border-color: #a67a20;
+  background: #fff8e9;
+  color: #765510;
+}
+
+.manager-application-card__actions .manager-application-card__reject {
+  border-color: #b65454;
+  background: #ffffff;
+  color: #a64242;
+}
+
+.manager-application-card__actions button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.manager-applications__retry {
+  margin-top: 16px;
+}
+
+@media (max-width: 600px) {
+  .manager-application-card {
+    padding: 16px;
+  }
+
+  .manager-application-card__header {
+    flex-direction: column;
+  }
+}
