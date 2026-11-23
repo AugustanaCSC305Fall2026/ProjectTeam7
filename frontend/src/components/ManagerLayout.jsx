@@ -7,6 +7,7 @@ const managerNavItems = [
   { to: "/manager/hours", label: "Hours" },
   { to: "/manager/corrections", label: "Time Corrections" },
   { to: "/manager/shifts", label: "Shifts" },
+  { to: "/manager/calendar", label: "Calendar" },
   { to: "/manager/applications", label: "Applications" },
   { to: "/manager/messages", label: "Messages" },
 ];

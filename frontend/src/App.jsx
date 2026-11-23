@@ -25,6 +25,7 @@ import ManagerEmployees from "./pages/ManagerEmployees";
 import ManagerHours from "./pages/ManagerHours";
 import ManagerShifts from "./pages/ManagerShifts";
 import ManagerApplications from "./pages/ManagerApplications";
+import ManagerCalendar from "./pages/ManagerCalendar";
 import StudentJobs from "./pages/StudentJobs";
 
 /*
@@ -124,6 +125,10 @@ const router = createBrowserRouter([
       {
         path: "shifts",
         element: <ManagerShifts />,
+      },
+      {
+        path: "calendar",
+        element: <ManagerCalendar />,
       },
       {
         path: "applications",
