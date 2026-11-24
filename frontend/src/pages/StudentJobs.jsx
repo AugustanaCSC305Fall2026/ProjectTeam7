@@ -32,9 +32,14 @@ function StudentJobs() {
       setMessage("Your application was submitted.");
     } catch (error) {
       console.error(error);
-      setMessage(
-        error.response?.data?.message || "Could not submit your application."
-      );
+      if (error.response?.status === 409) {
+        setAppliedJobIds((currentIds) =>
+          currentIds.includes(jobId) ? currentIds : [...currentIds, jobId]
+        );
+        setMessage("You have already applied to this job.");
+      } else {
+        setMessage("Could not submit your application.");
+      }
     }
   };
 

@@ -7,6 +7,8 @@ import edu.augustana.csc305.project.model.Job;
 import edu.augustana.csc305.project.model.JobApplication;
 import edu.augustana.csc305.project.repository.JobApplicationRepository;
 import edu.augustana.csc305.project.repository.JobRepository;
+import com.mongodb.ErrorCategory;
+import com.mongodb.MongoWriteException;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -77,7 +79,15 @@ public class JobApplicationService {
                 userId,
                 jobId,
                 applicationStatement);
-        jobApplicationRepository.storeApplication(application);
+        try {
+            jobApplicationRepository.storeApplication(application);
+        } catch (MongoWriteException exception) {
+            if (exception.getError().getCategory() == ErrorCategory.DUPLICATE_KEY) {
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT, "ALREADY_APPLIED");
+            }
+            throw exception;
+        }
 
         return new JobApplicationDto(
                 application.getId().toHexString(),
