@@ -120,6 +120,13 @@ function ManagerMessages() {
       <div className="messaging-page__heading">
         <h2>Messages</h2>
         <p>Message employees directly or keep your team in sync with a group chat.</p>
+        <p className={`messaging-page__connection messaging-page__connection--${messaging.connectionStatus}`} role="status">
+          {messaging.connectionStatus === "connected"
+            ? "Live updates connected"
+            : messaging.connectionStatus === "connecting"
+              ? "Connecting live updates…"
+              : "Live updates disconnected. Messages can still be sent."}
+        </p>
       </div>
       {messaging.error && (
         <div className="messaging-page__alert" role="alert" aria-live="assertive">

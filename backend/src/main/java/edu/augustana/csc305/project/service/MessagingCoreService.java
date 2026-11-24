@@ -10,6 +10,7 @@ import edu.augustana.csc305.project.repository.MessageRepository;
 import edu.augustana.csc305.project.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -21,14 +22,17 @@ public class MessagingCoreService {
     private final UserRepository userRepository;
     private final ConversationRepository conversationRepository;
     private final MessageRepository messageRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public MessagingCoreService(
             UserRepository userRepository,
             ConversationRepository conversationRepository,
-            MessageRepository messageRepository) {
+            MessageRepository messageRepository,
+            SimpMessagingTemplate messagingTemplate) {
         this.userRepository = userRepository;
         this.conversationRepository = conversationRepository;
         this.messageRepository = messageRepository;
+        this.messagingTemplate = messagingTemplate;
     }
 
     public Conversation getOrCreateDirectConversation(
@@ -70,7 +74,12 @@ public class MessagingCoreService {
                 new ObjectId(), conversation.getId(), userId, body, sentAt);
         messageRepository.store(message);
         conversationRepository.touch(conversation.getId(), sentAt);
-        return toMessageDto(message, findUser(userId));
+        MessageDto messageDto = toMessageDto(message, findUser(userId));
+        for (ObjectId memberId : conversation.getMemberIds()) {
+            messagingTemplate.convertAndSendToUser(
+                    memberId.toHexString(), "/queue/messages", messageDto);
+        }
+        return messageDto;
     }
 
     public Conversation findMemberConversation(ObjectId userId,

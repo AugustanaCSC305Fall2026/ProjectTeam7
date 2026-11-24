@@ -48,6 +48,9 @@ import java.util.List;
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers("/api/v1/auth/login").permitAll()
                         .requestMatchers("/api/v1/auth/register").permitAll()
+                        // The HTTP WebSocket handshake is open; the STOMP CONNECT frame
+                        // must authenticate with the existing JWT before subscribing.
+                        .requestMatchers("/ws").permitAll()
                         .requestMatchers("/api/v1/public/**").permitAll()
                         .requestMatchers("/api/v1/healthCheck").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/shifts").hasRole("ADMIN")

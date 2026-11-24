@@ -3,6 +3,8 @@ package edu.augustana.csc305.project.repository;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Updates;
 import edu.augustana.csc305.project.model.JobApplication;
 import org.bson.types.ObjectId;
@@ -22,6 +24,12 @@ public class JobApplicationRepository {
         applications = database.getCollection(
                 "jobApplications",
                 JobApplication.class);
+
+        applications.createIndex(
+                Indexes.compoundIndex(
+                        Indexes.ascending("userId"),
+                        Indexes.ascending("jobId")),
+                new IndexOptions().unique(true));
     }
 
     public Optional<JobApplication> findByUserIdAndJobId(
@@ -33,6 +41,17 @@ public class JobApplicationRepository {
         )).first();
 
         return Optional.ofNullable(application);
+    }
+
+    public List<JobApplication> findByUserId(ObjectId userId) {
+        List<JobApplication> results = new ArrayList<>();
+
+        for (JobApplication application : applications.find(
+                Filters.eq("userId", userId))) {
+            results.add(application);
+        }
+
+        return results;
     }
 
     public List<JobApplication> findByJobId(ObjectId jobId) {

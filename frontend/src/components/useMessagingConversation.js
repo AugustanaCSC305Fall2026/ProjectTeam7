@@ -1,5 +1,15 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import api from "../api/backendApi";
+import { connectMessagingSocket } from "../api/messagingSocket";
+
+function appendUniqueMessage(current, incoming) {
+  if (!incoming?.id || current.some((message) => message.id === incoming.id)) {
+    return current;
+  }
+  return [...current, incoming].sort(
+    (first, second) => new Date(first.sentAt) - new Date(second.sentAt),
+  );
+}
 
 function useMessagingConversation({
   loadLists,
@@ -17,6 +27,17 @@ function useMessagingConversation({
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
   const [sendError, setSendError] = useState("");
+  const [connectionStatus, setConnectionStatus] = useState("connecting");
+  const selectedConversationRef = useRef(selectedConversation);
+  const loadListsRef = useRef(loadLists);
+
+  useEffect(() => {
+    selectedConversationRef.current = selectedConversation;
+  }, [selectedConversation]);
+
+  useEffect(() => {
+    loadListsRef.current = loadLists;
+  }, [loadLists]);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -36,13 +57,30 @@ function useMessagingConversation({
     loadData();
   }, [loadData]);
 
+  useEffect(() => connectMessagingSocket({
+    onStatus: setConnectionStatus,
+    onMessage: (incoming) => {
+      if (selectedConversationRef.current?.id === incoming.conversationId) {
+        setMessages((current) => appendUniqueMessage(current, incoming));
+      }
+      loadListsRef.current().catch(() => {
+        // A failed preview refresh must not interrupt the live thread or REST UI.
+      });
+    },
+  }), []);
+
   const openConversation = useCallback(async (conversation) => {
+    selectedConversationRef.current = conversation;
     setSelectedConversation(conversation);
+    setMessages([]);
     setLoadingMessages(true);
     setSendError("");
     try {
       const response = await api.get(messagesUrl(conversation.id));
-      setMessages(response.data);
+      setMessages((current) => response.data.reduce(
+        (messagesWithEvents, message) => appendUniqueMessage(messagesWithEvents, message),
+        current,
+      ));
     } catch {
       setError(openErrorMessage);
     } finally {
@@ -56,7 +94,7 @@ function useMessagingConversation({
     setSendError("");
     try {
       const response = await api.post(sendUrl(selectedConversation.id), { body: messageBody });
-      setMessages((current) => [...current, response.data]);
+      setMessages((current) => appendUniqueMessage(current, response.data));
       setBody("");
       setFailedBody("");
       await loadLists();
@@ -75,6 +113,7 @@ function useMessagingConversation({
 
   return {
     body,
+    connectionStatus,
     error,
     failedBody,
     handleSend,

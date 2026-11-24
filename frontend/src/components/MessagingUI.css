@@ -3,6 +3,10 @@
 .messaging-page__heading { margin-bottom: 18px; }
 .messaging-page__heading h2 { margin: 0 0 5px; color: #26322f; font-size: 28px; letter-spacing: -.02em; }
 .messaging-page__heading p:last-child { margin: 0; color: #7b8581; font-size: 14px; }
+.messaging-page__heading .messaging-page__connection { margin-top: 6px; font-size: 11px; }
+.messaging-page__connection--connected { color: #187957 !important; }
+.messaging-page__connection--connecting { color: #8a7134 !important; }
+.messaging-page__connection--disconnected { color: #9b5050 !important; }
 .messaging-page__alert { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; padding: 10px 13px; border: 1px solid #f0caca; border-radius: 8px; background: #fff7f7; color: #8e3e3e; font-size: 13px; }
 .messaging-page__alert-icon { display: grid; flex: 0 0 19px; width: 19px; height: 19px; place-items: center; border-radius: 50%; background: #d86c6c; color: #fff; font-size: 12px; font-weight: 700; }
 .messaging-page__alert button { margin-left: auto; border: 0; background: transparent; color: #8e3e3e; font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
