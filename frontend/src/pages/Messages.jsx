@@ -60,6 +60,13 @@ function Messages({ supervisorMode = false }) {
           <p>{supervisorMode
             ? "Message managers, employees, and campus staff."
             : "Contact your coworkers, managers, and supervisors."}</p>
+          <p className={`messaging-page__connection messaging-page__connection--${messaging.connectionStatus}`} role="status">
+            {messaging.connectionStatus === "connected"
+              ? "Live updates connected"
+              : messaging.connectionStatus === "connecting"
+                ? "Connecting live updates…"
+                : "Live updates disconnected. Messages can still be sent."}
+          </p>
         </div>
       </div>
 
