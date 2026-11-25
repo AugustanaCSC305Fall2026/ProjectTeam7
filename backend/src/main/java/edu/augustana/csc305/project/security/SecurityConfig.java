@@ -89,7 +89,7 @@ import java.util.List;
                  */
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(List.of("http://localhost:5173","http://localhost:5174"));
+                    config.setAllowedOrigins(List.of("http://localhost:5173","http://localhost:5174", "https://augustanacsc305fall2026.github.io"));
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
                     config.setAllowedHeaders(List.of("*"));
                     return config;
