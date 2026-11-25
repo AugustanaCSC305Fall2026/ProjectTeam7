@@ -4,3 +4,4 @@ node_modules
 .env
 .idea/
 atlas-credentials.env
+.env.production

@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createHashRouter, RouterProvider } from "react-router-dom";
 
 import Login from "./pages/Login";
 import CreateAccount from "./pages/CreateAccount";
@@ -36,7 +36,7 @@ import StudentJobs from "./pages/StudentJobs";
  * Matching happens from top to bottom; the last path is "*",
  * which is the fall-through case when no other path matches.
  */
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: "/",
     element:(
