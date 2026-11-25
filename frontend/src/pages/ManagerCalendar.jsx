@@ -134,6 +134,17 @@ function ManagerCalendar() {
                     shift.employeeId === selectedEmployee
             );
     };
+    const hasVisibleShifts = shifts.some((shift) => {
+        if (selectedEmployee === "all") {
+            return true;
+        }
+
+        const employee = employees.find(
+            (employee) => employee.employmentId === shift.employmentId
+        );
+
+        return employee?.id === selectedEmployee;
+    });
 
     const formatTime = (date) => {
         return new Date(date).toLocaleTimeString("en-US", {
@@ -190,7 +201,11 @@ function ManagerCalendar() {
                     Next
                 </button>
             </div>
-
+            {!hasVisibleShifts && (
+                <p className="calendar-empty-message">
+                    No scheduled shifts for the selected employee this month.
+                </p>
+            )}
             <div className="calendar-weekdays">
                 {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
                     <div key={day}>{day}</div>
